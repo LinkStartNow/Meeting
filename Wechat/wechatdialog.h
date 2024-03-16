@@ -2,6 +2,7 @@
 #define WECHATDIALOG_H
 
 #include <QDialog>
+#include <QCloseEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class WeChatDialog; }
@@ -15,7 +16,12 @@ public:
     WeChatDialog(QWidget *parent = nullptr);
     ~WeChatDialog();
 
+signals:
+    void sig_destroy();
+
 private:
     Ui::WeChatDialog *ui;
+
+    void closeEvent(QCloseEvent *);
 };
 #endif // WECHATDIALOG_H
