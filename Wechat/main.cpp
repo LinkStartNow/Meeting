@@ -10,6 +10,5 @@ int main(int argc, char *argv[])
 //    WeChatDialog w;
 //    w.show();
     CKernel::GetKernel();
-    qDebug() << "测试push成功！！！";
     return a.exec();
 }

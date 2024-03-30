@@ -31,25 +31,25 @@ public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QLabel *label;
-    QLineEdit *lineEdit;
+    QLineEdit *le_phone;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_2;
-    QLineEdit *lineEdit_2;
+    QLineEdit *le_pass;
     QHBoxLayout *horizontalLayout_3;
-    QPushButton *pushButton_2;
-    QPushButton *pushButton;
+    QPushButton *pb_clear;
+    QPushButton *pb_login;
     QWidget *tab_2;
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_3;
     QHBoxLayout *horizontalLayout_4;
     QLabel *label_3;
-    QLineEdit *lineEdit_3;
+    QLineEdit *le_phone_r;
     QHBoxLayout *horizontalLayout_5;
     QLabel *label_4;
-    QLineEdit *lineEdit_4;
+    QLineEdit *le_pass_r;
     QHBoxLayout *horizontalLayout_6;
-    QPushButton *pushButton_3;
-    QPushButton *pushButton_4;
+    QPushButton *pb_clear_r;
+    QPushButton *pb_register;
 
     void setupUi(QDialog *LoginWin)
     {
@@ -72,10 +72,10 @@ public:
 
         horizontalLayout->addWidget(label);
 
-        lineEdit = new QLineEdit(tab);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+        le_phone = new QLineEdit(tab);
+        le_phone->setObjectName(QString::fromUtf8("le_phone"));
 
-        horizontalLayout->addWidget(lineEdit);
+        horizontalLayout->addWidget(le_phone);
 
 
         verticalLayout->addLayout(horizontalLayout);
@@ -87,25 +87,25 @@ public:
 
         horizontalLayout_2->addWidget(label_2);
 
-        lineEdit_2 = new QLineEdit(tab);
-        lineEdit_2->setObjectName(QString::fromUtf8("lineEdit_2"));
+        le_pass = new QLineEdit(tab);
+        le_pass->setObjectName(QString::fromUtf8("le_pass"));
 
-        horizontalLayout_2->addWidget(lineEdit_2);
+        horizontalLayout_2->addWidget(le_pass);
 
 
         verticalLayout->addLayout(horizontalLayout_2);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        pushButton_2 = new QPushButton(tab);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        pb_clear = new QPushButton(tab);
+        pb_clear->setObjectName(QString::fromUtf8("pb_clear"));
 
-        horizontalLayout_3->addWidget(pushButton_2);
+        horizontalLayout_3->addWidget(pb_clear);
 
-        pushButton = new QPushButton(tab);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pb_login = new QPushButton(tab);
+        pb_login->setObjectName(QString::fromUtf8("pb_login"));
 
-        horizontalLayout_3->addWidget(pushButton);
+        horizontalLayout_3->addWidget(pb_login);
 
 
         verticalLayout->addLayout(horizontalLayout_3);
@@ -127,10 +127,10 @@ public:
 
         horizontalLayout_4->addWidget(label_3);
 
-        lineEdit_3 = new QLineEdit(tab_2);
-        lineEdit_3->setObjectName(QString::fromUtf8("lineEdit_3"));
+        le_phone_r = new QLineEdit(tab_2);
+        le_phone_r->setObjectName(QString::fromUtf8("le_phone_r"));
 
-        horizontalLayout_4->addWidget(lineEdit_3);
+        horizontalLayout_4->addWidget(le_phone_r);
 
 
         verticalLayout_3->addLayout(horizontalLayout_4);
@@ -142,25 +142,25 @@ public:
 
         horizontalLayout_5->addWidget(label_4);
 
-        lineEdit_4 = new QLineEdit(tab_2);
-        lineEdit_4->setObjectName(QString::fromUtf8("lineEdit_4"));
+        le_pass_r = new QLineEdit(tab_2);
+        le_pass_r->setObjectName(QString::fromUtf8("le_pass_r"));
 
-        horizontalLayout_5->addWidget(lineEdit_4);
+        horizontalLayout_5->addWidget(le_pass_r);
 
 
         verticalLayout_3->addLayout(horizontalLayout_5);
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
-        pushButton_3 = new QPushButton(tab_2);
-        pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
+        pb_clear_r = new QPushButton(tab_2);
+        pb_clear_r->setObjectName(QString::fromUtf8("pb_clear_r"));
 
-        horizontalLayout_6->addWidget(pushButton_3);
+        horizontalLayout_6->addWidget(pb_clear_r);
 
-        pushButton_4 = new QPushButton(tab_2);
-        pushButton_4->setObjectName(QString::fromUtf8("pushButton_4"));
+        pb_register = new QPushButton(tab_2);
+        pb_register->setObjectName(QString::fromUtf8("pb_register"));
 
-        horizontalLayout_6->addWidget(pushButton_4);
+        horizontalLayout_6->addWidget(pb_register);
 
 
         verticalLayout_3->addLayout(horizontalLayout_6);
@@ -172,7 +172,7 @@ public:
 
         retranslateUi(LoginWin);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(LoginWin);
@@ -182,17 +182,17 @@ public:
     {
         LoginWin->setWindowTitle(QApplication::translate("LoginWin", "\346\254\242\350\277\216", nullptr));
         label->setText(QApplication::translate("LoginWin", "\350\264\246\345\217\267\357\274\232", nullptr));
-        lineEdit->setPlaceholderText(QApplication::translate("LoginWin", "\347\224\265\350\257\235", nullptr));
+        le_phone->setPlaceholderText(QApplication::translate("LoginWin", "\347\224\265\350\257\235", nullptr));
         label_2->setText(QApplication::translate("LoginWin", "\345\257\206\347\240\201\357\274\232", nullptr));
-        lineEdit_2->setText(QString());
-        pushButton_2->setText(QApplication::translate("LoginWin", "\346\270\205\347\251\272", nullptr));
-        pushButton->setText(QApplication::translate("LoginWin", "\347\231\273\345\275\225", nullptr));
+        le_pass->setText(QString());
+        pb_clear->setText(QApplication::translate("LoginWin", "\346\270\205\347\251\272", nullptr));
+        pb_login->setText(QApplication::translate("LoginWin", "\347\231\273\345\275\225", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("LoginWin", " \347\231\273\345\275\225", nullptr));
         label_3->setText(QApplication::translate("LoginWin", "\350\264\246\345\217\267\357\274\232", nullptr));
-        lineEdit_3->setPlaceholderText(QApplication::translate("LoginWin", "\347\224\265\350\257\235", nullptr));
+        le_phone_r->setPlaceholderText(QApplication::translate("LoginWin", "\347\224\265\350\257\235", nullptr));
         label_4->setText(QApplication::translate("LoginWin", "\345\257\206\347\240\201\357\274\232", nullptr));
-        pushButton_3->setText(QApplication::translate("LoginWin", "\346\270\205\347\251\272", nullptr));
-        pushButton_4->setText(QApplication::translate("LoginWin", "\346\263\250\345\206\214", nullptr));
+        pb_clear_r->setText(QApplication::translate("LoginWin", "\346\270\205\347\251\272", nullptr));
+        pb_register->setText(QApplication::translate("LoginWin", "\346\263\250\345\206\214", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("LoginWin", " \346\263\250\345\206\214", nullptr));
     } // retranslateUi
 

@@ -15,6 +15,15 @@ public:
     explicit LoginWin(QWidget *parent = nullptr);
     ~LoginWin();
 
+private slots:
+
+
+    void on_pb_login_clicked();
+
+signals:
+    void sig_LoginRQ(char*);
+    void sig_RegisterRQ(char*);
+
 private:
     Ui::LoginWin *ui;
 };

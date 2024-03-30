@@ -1,7 +1,22 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-#define IP "192.168.63.231"
-#define PORT 12345
+#define IP          ("192.168.59.129")
+#define PORT        (12345)
+#define PRO_CNT     (4)
+
+// 协议
+#define PRO_BASE    (6666)
+
+// 登录
+#define LOG_RQ      (PRO_BASE)
+#define LOG_RS      (PRO_BASE + 1)
+
+// 注册
+#define REG_RQ      (PRO_BASE + 2)
+#define REG_RS      (PRO_BASE + 3)
+
+// 回复
+#define LOG_SUCCESS (1)
 
 #endif // PROTOCOL_H
