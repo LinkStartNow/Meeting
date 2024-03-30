@@ -6,6 +6,8 @@
 #include "loginwin.h"
 #include "tcpsock.h"
 #include "Protocol.h"
+#include <mutex>
+#include <memory>
 #include <functional>
 
 class CKernel : public QObject
@@ -14,11 +16,13 @@ class CKernel : public QObject
 //    using fun = void(CKernel::*)(char*);
     using fun = std::function<void(char*)>;
 
-    WeChatDialog* m_pWeChat;
-    LoginWin* m_pLogin;
-    Tcpsock* m_chat;
-
-    fun m_ProToFun[PRO_CNT];
+    WeChatDialog*                       m_pWeChat;
+    LoginWin*                           m_pLogin;
+    Tcpsock*                            m_chat;
+    QString                             m_serverIP;
+    fun                                 m_ProToFun[PRO_CNT];
+    static std::once_flag               m_once;
+    static std::unique_ptr<CKernel>     self;
 
     void SetProFun();
 
@@ -26,12 +30,11 @@ class CKernel : public QObject
     void DealLoginRs(char* con);
     void DealRegRs(char* con);
 
-public:
     explicit CKernel(QObject *parent = nullptr);
-    static CKernel* GetKernel() {
-        static CKernel kernel;
-        return &kernel;
-    }
+
+public:
+    static CKernel* GetKernel();
+    void InitConfig();
 
 private slots:
     void slot_destroy();
