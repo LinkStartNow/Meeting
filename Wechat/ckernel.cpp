@@ -5,9 +5,6 @@
 
 #define FUNMAP(a) m_ProToFun[a - PRO_BASE]
 
-std::once_flag CKernel::m_once;
-std::unique_ptr<CKernel> CKernel::self;
-
 void CKernel::SetProFun()
 {
 
@@ -43,16 +40,13 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     // 绑定函数
     SetProFun();
 
-    // 加载配置文件
-    InitConfig();
-
     m_pWeChat = new WeChatDialog;
 //    m_pWeChat->show();
 
     connect(m_pWeChat, SIGNAL(sig_destroy()), this, SLOT(slot_destroy()));
 
     m_chat = new Tcpsock;
-    if (!m_chat->Connect(m_serverIP.toStdString().c_str(), PORT)) {
+    if (!m_chat->Connect(IP, PORT)) {
         qDebug() << "connect error";
         exit(-1);
     }
@@ -62,55 +56,6 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     m_pLogin->show();
     connect(m_pLogin, &LoginWin::sig_LoginRQ, this, &CKernel::slot_LoginRQ);
     connect(m_pLogin, &LoginWin::sig_RegisterRQ, this, &CKernel::slot_RegisterRQ);
-}
-
-CKernel *CKernel::GetKernel()
-{
-    std::call_once(m_once, []() {
-       self.reset(new CKernel);
-    });
-    return self.get();
-}
-
-#include <QSettings>
-#include <QApplication>
-#include <QFileInfo>
-
-void CKernel::InitConfig()
-{
-    m_serverIP = IP;
-
-    // 路径设置在exe同级下 config.ini
-    QString path = QApplication::applicationDirPath() + "/config.ini";
-    qDebug() << path;
-
-    // 判断是否存在
-    QFileInfo info(path);
-    QSettings setting(path, QSettings::IniFormat, nullptr);
-    if (info.exists()) {
-        // 加载配置文件，设置为配置文件中的ip
-
-        // 打开组
-        setting.beginGroup("Net");
-
-        m_serverIP = setting.value("ip").toString();
-
-        // 关闭组
-        setting.endGroup();
-    }
-    else {
-        // 没有配置文件，写入默认的ip
-
-        // 打开组
-        setting.beginGroup("Net");
-
-        setting.setValue("ip", m_serverIP);
-
-        // 关闭组
-        setting.endGroup();
-    }
-
-    qDebug() << m_serverIP;
 }
 
 void CKernel::slot_destroy()
