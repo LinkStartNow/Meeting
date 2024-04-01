@@ -20,6 +20,12 @@ private slots:
 
     void on_pb_login_clicked();
 
+    void on_pb_clear_clicked();
+
+    void on_pb_clear_r_clicked();
+
+    void on_pb_register_clicked();
+
 signals:
     void sig_LoginRQ(char*);
     void sig_RegisterRQ(char*);

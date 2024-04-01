@@ -16,7 +16,10 @@
 #define REG_RQ      (PRO_BASE + 2)
 #define REG_RS      (PRO_BASE + 3)
 
-// 回复
+// 登录回复
 #define LOG_SUCCESS (1)
+
+// 注册回复
+#define REG_SUCCESS (1)
 
 #endif // PROTOCOL_H

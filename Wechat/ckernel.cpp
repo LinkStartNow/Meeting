@@ -30,6 +30,14 @@ void CKernel::DealLoginRs(char *con)
 void CKernel::DealRegRs(char *con)
 {
     qDebug() << __func__;
+
+    CJson json(con);
+    delete [] con, con = nullptr;
+
+    int result = json.json_get_int("result");
+    if (result == REG_SUCCESS) {
+        QMessageBox::information(nullptr, "提示", "注册成功！");
+    }
 }
 
 CKernel::CKernel(QObject *parent) : QObject(parent)
