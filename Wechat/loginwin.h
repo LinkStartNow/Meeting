@@ -27,8 +27,7 @@ private slots:
     void on_pb_register_clicked();
 
 signals:
-    void sig_LoginRQ(char*);
-    void sig_RegisterRQ(char*);
+    void sig_SendRQ(char*);
 
 private:
     Ui::LoginWin *ui;

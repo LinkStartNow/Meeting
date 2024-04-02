@@ -14,6 +14,45 @@ void CKernel::SetProFun()
     FUNMAP(REG_RS) = std::bind(&CKernel::DealRegRs, this, std::placeholders::_1);
 }
 
+#include <QFileInfo>
+#include <QApplication>
+#include <QSettings>
+void CKernel::InitConfig()
+{
+    qDebug() << __func__;
+    m_ip = IP;
+    // 获取路径
+    QString path = QApplication::applicationDirPath() + "/config.ini";
+
+    QFileInfo test(path);
+    QSettings set(path, QSettings::IniFormat, nullptr);
+    if (test.exists()) {
+        // 存在，则读取IP
+        qDebug() << 123;
+        // 打开组
+        set.beginGroup("Net");
+
+        // 读取值
+        m_ip = set.value("ip").toString();
+        qDebug() << m_ip;
+
+        // 关闭组
+        set.endGroup();
+    }
+    else {
+        // 不存在，写入IP
+        qDebug() << 666;
+        // 打开组
+        set.beginGroup("Net");
+
+        // 写入值
+        set.setValue("ip", m_ip);
+
+        // 关闭组
+        set.endGroup();
+    }
+}
+
 void CKernel::DealLoginRs(char *con)
 {
     qDebug() << __func__;
@@ -45,6 +84,12 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
 
     qDebug() << __func__;
 
+
+    // 加载配置文件
+    InitConfig();
+
+    qDebug() << QString("Ip:%1").arg(m_ip);
+
     // 绑定函数
     SetProFun();
 
@@ -54,7 +99,7 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     connect(m_pWeChat, SIGNAL(sig_destroy()), this, SLOT(slot_destroy()));
 
     m_chat = new Tcpsock;
-    if (!m_chat->Connect(IP, PORT)) {
+    if (!m_chat->Connect(m_ip.toStdString().c_str(), PORT)) {
         qDebug() << "connect error";
         exit(-1);
     }
@@ -62,8 +107,7 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
 
     m_pLogin = new LoginWin;
     m_pLogin->show();
-    connect(m_pLogin, &LoginWin::sig_LoginRQ, this, &CKernel::slot_LoginRQ);
-    connect(m_pLogin, &LoginWin::sig_RegisterRQ, this, &CKernel::slot_RegisterRQ);
+    connect(m_pLogin, &LoginWin::sig_SendRQ, this, &CKernel::slot_SendRQ);
 }
 
 void CKernel::slot_destroy()
@@ -92,12 +136,7 @@ void CKernel::slot_Deal(char *buf)
     FUNMAP(type)(buf);
 }
 
-void CKernel::slot_LoginRQ(char * buf)
+void CKernel::slot_SendRQ(char * buf)
 {
     m_chat->Write(buf, strlen(buf) + 1);
-}
-
-void CKernel::slot_RegisterRQ(char *)
-{
-
 }

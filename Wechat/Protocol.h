@@ -1,7 +1,7 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-#define IP          ("192.168.59.129")
+#define IP          ("192.168.59.130")
 #define PORT        (12345)
 #define PRO_CNT     (4)
 

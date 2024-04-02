@@ -209,7 +209,7 @@ public:
 
         retranslateUi(LoginWin);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(LoginWin);

@@ -50,7 +50,7 @@ void LoginWin::on_pb_login_clicked()
     json.json_add_value("pass", pass.toStdString().c_str());
 
     QByteArray con = json.json_to_string();
-    Q_EMIT sig_LoginRQ(con.data());
+    Q_EMIT sig_SendRQ(con.data());
 }
 
 
@@ -118,6 +118,6 @@ void LoginWin::on_pb_register_clicked()
     json.json_add_value("name", name.toStdString().c_str());
 
     QByteArray con = json.json_to_string();
-    Q_EMIT sig_LoginRQ(con.data());
+    Q_EMIT sig_SendRQ(con.data());
 }
 

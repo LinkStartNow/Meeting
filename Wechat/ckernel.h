@@ -17,10 +17,11 @@ class CKernel : public QObject
     WeChatDialog* m_pWeChat;
     LoginWin* m_pLogin;
     Tcpsock* m_chat;
-
+    QString m_ip;
     fun m_ProToFun[PRO_CNT];
 
     void SetProFun();
+    void InitConfig();
 
     // 处理函数
     void DealLoginRs(char* con);
@@ -39,8 +40,7 @@ private slots:
     void slot_Deal(char* buf);
 
     // 处理的槽
-    void slot_LoginRQ(char*);
-    void slot_RegisterRQ(char*);
+    void slot_SendRQ(char*);
 signals:
 
 };
