@@ -112,6 +112,14 @@ void Tcpsock::EndRecv()
     IsRecving = false;
 }
 
+void Tcpsock::Close()
+{
+    IsRecving = false;
+
+    // 调用父类的Close
+    Mysock::Close();
+}
+
 void Tcpsock::RecvThread::run()
 {
     while (IsRecving && m_chat->Read());

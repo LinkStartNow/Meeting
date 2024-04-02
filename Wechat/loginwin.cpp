@@ -3,10 +3,18 @@
 #include <cjson.h>
 #include "Protocol.h"
 #include <QMessageBox>
+#include "md5.h"
+#include <QDebug>
 
-LoginWin::LoginWin(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::LoginWin)
+string TurnToMd5(string&& s)
+{
+    s += "_";
+    s += MD5_KEY;
+    MD5 m(s);
+    return m.toString();
+}
+
+LoginWin::LoginWin(QWidget *parent): QDialog(parent), ui(new Ui::LoginWin)
 {
     ui->setupUi(this);
 }
@@ -44,10 +52,13 @@ void LoginWin::on_pb_login_clicked()
         return;
     }
 
+    string pass_md = TurnToMd5(pass.toStdString());
+    qDebug() << QString().fromStdString(pass_md);
+
     CJson json;
     json.json_add_value("type", LOG_RQ);
     json.json_add_value("phone", phone.toStdString().c_str());
-    json.json_add_value("pass", pass.toStdString().c_str());
+    json.json_add_value("pass", pass_md.c_str());
 
     QByteArray con = json.json_to_string();
     Q_EMIT sig_SendRQ(con.data());
@@ -119,5 +130,12 @@ void LoginWin::on_pb_register_clicked()
 
     QByteArray con = json.json_to_string();
     Q_EMIT sig_SendRQ(con.data());
+}
+
+#include <QCloseEvent>
+void LoginWin::closeEvent(QCloseEvent *event)
+{
+    Q_EMIT sig_destroy();
+    event->ignore();
 }
 

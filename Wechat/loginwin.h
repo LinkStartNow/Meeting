@@ -28,9 +28,12 @@ private slots:
 
 signals:
     void sig_SendRQ(char*);
+    void sig_destroy();
 
 private:
     Ui::LoginWin *ui;
+
+    void closeEvent(QCloseEvent *);
 };
 
 #endif // LOGINWIN_H

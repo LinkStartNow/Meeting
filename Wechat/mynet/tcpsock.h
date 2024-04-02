@@ -35,6 +35,8 @@ public:
 
     void EndRecv();
 
+    void Close();
+
 signals:
     void sig_Deal(char* buf);
 };

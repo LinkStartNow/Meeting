@@ -4,6 +4,7 @@
 #define IP          ("192.168.59.130")
 #define PORT        (12345)
 #define PRO_CNT     (4)
+#define MD5_KEY     ("1234")
 
 // 协议
 #define PRO_BASE    (6666)

@@ -25,6 +25,7 @@ FORMS += \
     wechatdialog.ui
 
 include(mynet/mynet.pri)
+include(md5/md5.pri)
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

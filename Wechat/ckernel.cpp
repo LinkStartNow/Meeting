@@ -28,20 +28,17 @@ void CKernel::InitConfig()
     QSettings set(path, QSettings::IniFormat, nullptr);
     if (test.exists()) {
         // 存在，则读取IP
-        qDebug() << 123;
         // 打开组
         set.beginGroup("Net");
 
         // 读取值
         m_ip = set.value("ip").toString();
-        qDebug() << m_ip;
 
         // 关闭组
         set.endGroup();
     }
     else {
         // 不存在，写入IP
-        qDebug() << 666;
         // 打开组
         set.beginGroup("Net");
 
@@ -88,8 +85,6 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     // 加载配置文件
     InitConfig();
 
-    qDebug() << QString("Ip:%1").arg(m_ip);
-
     // 绑定函数
     SetProFun();
 
@@ -107,6 +102,7 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
 
     m_pLogin = new LoginWin;
     m_pLogin->show();
+    connect(m_pLogin, &LoginWin::sig_destroy, this, &CKernel::slot_destroy);
     connect(m_pLogin, &LoginWin::sig_SendRQ, this, &CKernel::slot_SendRQ);
 }
 
@@ -115,8 +111,15 @@ void CKernel::slot_destroy()
     qDebug() << __func__;
     if (m_pWeChat) {
         m_pWeChat->hide();
-        delete m_pWeChat;
-        m_pWeChat = nullptr;
+        delete m_pWeChat; m_pWeChat = nullptr;
+    }
+    if (m_pLogin) {
+        m_pLogin->hide();
+        delete m_pLogin; m_pLogin = nullptr;
+    }
+    if (m_chat) {
+        m_chat->Close();
+        delete m_chat; m_chat = nullptr;
     }
 }
 

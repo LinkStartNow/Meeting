@@ -14,11 +14,11 @@ class CKernel : public QObject
 //    using fun = void(CKernel::*)(char*);
     using fun = std::function<void(char*)>;
 
-    WeChatDialog* m_pWeChat;
-    LoginWin* m_pLogin;
-    Tcpsock* m_chat;
-    QString m_ip;
-    fun m_ProToFun[PRO_CNT];
+    WeChatDialog*       m_pWeChat;
+    LoginWin*           m_pLogin;
+    Tcpsock*            m_chat;
+    QString             m_ip;
+    fun                 m_ProToFun[PRO_CNT];
 
     void SetProFun();
     void InitConfig();
