@@ -40,7 +40,7 @@ void LoginWin::on_pb_login_clicked()
     }
 
     // 1. 校验手机号
-    QRegExp reg("^1[3-8][0-9]{6,9}$");
+    QRegExp reg("^1[3-8][0-9]{9}$");
     if (!reg.exactMatch(ph)) {
         QMessageBox::information(this, "提示", "请检查手机号是否输入错误！");
         return;
@@ -63,7 +63,6 @@ void LoginWin::on_pb_login_clicked()
     QByteArray con = json.json_to_string();
     Q_EMIT sig_SendRQ(con.data());
 }
-
 
 // 清空登录信息
 void LoginWin::on_pb_clear_clicked()
@@ -98,7 +97,7 @@ void LoginWin::on_pb_register_clicked()
     }
 
     // 1. 校验手机号
-    QRegExp reg("^1[3-8][0-9]{6,9}$");
+    QRegExp reg("^1[3-8][0-9]{9}$");
     if (!reg.exactMatch(ph)) {
         QMessageBox::information(this, "提示", "请检查手机号是否输入错误！");
         return;
@@ -125,7 +124,7 @@ void LoginWin::on_pb_register_clicked()
     CJson json;
     json.json_add_value("type", REG_RQ);
     json.json_add_value("phone", phone.toStdString().c_str());
-    json.json_add_value("pass", pass.toStdString().c_str());
+    json.json_add_value("pass", TurnToMd5(pass.toStdString()).c_str());
     json.json_add_value("name", name.toStdString().c_str());
 
     QByteArray con = json.json_to_string();

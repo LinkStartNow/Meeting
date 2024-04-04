@@ -1,7 +1,7 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-#define IP          ("192.168.59.130")
+#define IP          ("192.168.59.129")
 #define PORT        (12345)
 #define PRO_CNT     (4)
 #define MD5_KEY     ("1234")
@@ -18,9 +18,13 @@
 #define REG_RS      (PRO_BASE + 3)
 
 // 登录回复
-#define LOG_SUCCESS (1)
+#define LOG_SUCCESS (0)
+#define USER_MISS   (1)
+#define PASS_ERROR  (2)
 
 // 注册回复
-#define REG_SUCCESS (1)
+#define REG_SUCCESS (0)
+#define NAME_USED   (1)
+#define TEL_USED    (2)
 
 #endif // PROTOCOL_H

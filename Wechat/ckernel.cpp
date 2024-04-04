@@ -58,8 +58,22 @@ void CKernel::DealLoginRs(char *con)
     delete [] con, con = nullptr;
 
     int result = json.json_get_int("result");
-    if (result == LOG_SUCCESS) {
-        QMessageBox::information(nullptr, "提示", "登录成功！");
+    switch (result) {
+    case LOG_SUCCESS: {
+        QMessageBox::information(nullptr, "提示", QString("用户名:%1, 个性签名:%2, id:%3")
+                                 .arg(json.json_get_string("name"))
+                                 .arg(json.json_get_string("feeling"))
+                                 .arg(json.json_get_string("id")));
+        break;
+    }
+    case USER_MISS: {
+        QMessageBox::information(nullptr, "提示", "用户不存在，请检查手机号！");
+        break;
+    }
+    case PASS_ERROR: {
+        QMessageBox::information(nullptr, "提示", "密码错误，请重新输入！");
+        break;
+    }
     }
 }
 
@@ -71,8 +85,19 @@ void CKernel::DealRegRs(char *con)
     delete [] con, con = nullptr;
 
     int result = json.json_get_int("result");
-    if (result == REG_SUCCESS) {
+    switch (result) {
+    case REG_SUCCESS: {
         QMessageBox::information(nullptr, "提示", "注册成功！");
+        break;
+    }
+    case NAME_USED: {
+        QMessageBox::information(nullptr, "提示", "用户名已被使用！");
+        break;
+    }
+    case TEL_USED: {
+        QMessageBox::information(nullptr, "提示", "此手机号已经注册过用户！");
+        break;
+    }
     }
 }
 

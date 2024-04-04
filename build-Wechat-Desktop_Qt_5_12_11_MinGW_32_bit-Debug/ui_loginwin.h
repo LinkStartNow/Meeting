@@ -209,7 +209,7 @@ public:
 
         retranslateUi(LoginWin);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(LoginWin);
@@ -240,11 +240,13 @@ public:
 #ifndef QT_NO_TOOLTIP
         le_pass_r->setToolTip(QApplication::translate("LoginWin", "<html><head/><body><p>\350\257\267\350\256\276\347\275\256\345\257\206\347\240\201</p></body></html>", nullptr));
 #endif // QT_NO_TOOLTIP
+        le_pass_r->setText(QApplication::translate("LoginWin", "123", nullptr));
         lb_phone_r->setText(QApplication::translate("LoginWin", "\347\224\265\350\257\235\357\274\232", nullptr));
         lb_pass_rp->setText(QApplication::translate("LoginWin", "\347\241\256\350\256\244\345\257\206\347\240\201\357\274\232", nullptr));
 #ifndef QT_NO_TOOLTIP
         le_name_r->setToolTip(QApplication::translate("LoginWin", "<html><head/><body><p>\347\224\250\346\210\267\345\220\215\347\224\261\346\225\260\345\255\227\343\200\201\345\255\227\347\254\246\343\200\201\344\270\213\345\210\222\347\272\277\347\273\204\346\210\220</p><p>\351\225\277\345\272\246\344\270\215\350\266\205\350\277\20710</p></body></html>", nullptr));
 #endif // QT_NO_TOOLTIP
+        le_name_r->setText(QApplication::translate("LoginWin", "\344\270\215\347\237\245\351\201\223.", nullptr));
         le_name_r->setPlaceholderText(QString());
 #ifndef QT_NO_TOOLTIP
         le_phone_r->setToolTip(QApplication::translate("LoginWin", "<html><head/><body><p>\350\257\267\350\276\223\345\205\24511\344\275\215\346\211\213\346\234\272\345\217\267</p></body></html>", nullptr));
@@ -254,6 +256,7 @@ public:
 #ifndef QT_NO_TOOLTIP
         le_pass_rp->setToolTip(QApplication::translate("LoginWin", "<html><head/><body><p>\350\257\267\345\206\215\346\254\241\350\276\223\345\205\245\344\270\200\344\270\213\345\257\206\347\240\201</p></body></html>", nullptr));
 #endif // QT_NO_TOOLTIP
+        le_pass_rp->setText(QApplication::translate("LoginWin", "123", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("LoginWin", "\346\263\250\345\206\214", nullptr));
     } // retranslateUi
 
