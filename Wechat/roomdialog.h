@@ -14,6 +14,7 @@ class RoomDialog : public QDialog
 public:
     explicit RoomDialog(QWidget *parent = nullptr);
     ~RoomDialog();
+    void SetInfo(QString RoomId);
 
 signals:
     void sig_QuitRoom();

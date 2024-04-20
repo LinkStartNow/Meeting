@@ -16,6 +16,11 @@ RoomDialog::~RoomDialog()
     delete ui;
 }
 
+void RoomDialog::SetInfo(QString RoomId)
+{
+    setWindowTitle(QString("房间号：%1").arg(RoomId));
+}
+
 void RoomDialog::closeEvent(QCloseEvent *event)
 {
     qDebug() << __func__;

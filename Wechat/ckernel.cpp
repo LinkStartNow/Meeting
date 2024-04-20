@@ -10,10 +10,12 @@ void CKernel::SetProFun()
 
     memset(m_ProToFun, 0, sizeof (m_ProToFun));
 
-    FUNMAP(LOG_RS)          = std::bind(&CKernel::DealLoginRs, this, std::placeholders::_1);
-    FUNMAP(REG_RS)          = std::bind(&CKernel::DealRegRs, this, std::placeholders::_1);
-    FUNMAP(CREATE_ROOM_RS)  = std::bind(&CKernel::DealCreateRoomRs, this, std::placeholders::_1);
-    FUNMAP(JOIN_ROOM_RS)    = std::bind(&CKernel::DealJoinRoomRs, this, std::placeholders::_1);
+    FUNMAP(LOG_RS)           = std::bind(&CKernel::DealLoginRs, this, std::placeholders::_1);
+    FUNMAP(REG_RS)           = std::bind(&CKernel::DealRegRs, this, std::placeholders::_1);
+    FUNMAP(CREATE_ROOM_RS)   = std::bind(&CKernel::DealCreateRoomRs, this, std::placeholders::_1);
+    FUNMAP(JOIN_ROOM_RS)     = std::bind(&CKernel::DealJoinRoomRs, this, std::placeholders::_1);
+    FUNMAP(JOIN_INFO)        = std::bind(&CKernel::DealJoinInfo, this, std::placeholders::_1);
+    FUNMAP(LEAVE_INFO)       = std::bind(&CKernel::DealLeaveInfo, this, std::placeholders::_1);
 }
 
 #include <QFileInfo>
@@ -117,6 +119,7 @@ void CKernel::DealCreateRoomRs(char *con)
 
     m_RoomId = json.json_get_int("RoomId");
     m_pRoom = new RoomDialog;
+    m_pRoom->SetInfo(QString::number(m_RoomId));
     connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
     m_pRoom->showNormal();
     qDebug() << "room:" << m_RoomId;
@@ -136,7 +139,10 @@ void CKernel::DealJoinRoomRs(char *con)
     case JOIN_SUCCESS: {
         m_RoomId = json.json_get_int("RoomId");
         m_Member = json.json_get_int_list("MemberList");
+
+        // 创建并初始化房间
         m_pRoom = new RoomDialog;
+        m_pRoom->SetInfo(QString::number(m_RoomId));
         qDebug() << "room:" << m_RoomId;
         connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
         m_pRoom->showNormal();
@@ -156,6 +162,30 @@ void CKernel::DealJoinRoomRs(char *con)
         break;
     }
     }
+}
+
+void CKernel::DealJoinInfo(char *con)
+{
+    qDebug() << __func__;
+
+    CJson json(con);
+    delete [] con, con = nullptr;
+
+    int id = json.json_get_int("id");
+
+    QMessageBox::about(m_pRoom, "提示", QString("欢迎%1加入房间！").arg(id));
+}
+
+void CKernel::DealLeaveInfo(char *con)
+{
+    qDebug() << __func__;
+
+    CJson json(con);
+    delete [] con, con = nullptr;
+
+    int id = json.json_get_int("UserId");
+
+    QMessageBox::about(m_pRoom, "提示", QString("%1悄无声息地离开了……").arg(id));
 }
 
 CKernel::CKernel(QObject *parent) : QObject(parent)
@@ -286,10 +316,20 @@ void CKernel::slot_join()
 void CKernel::slot_QuitRoom()
 {
     qDebug() << __func__;
+
+    CJson json;
+    json.json_add_value("type", LEAVE_INFO);
+    json.json_add_value("UserId", m_UserId);
+    json.json_add_value("RoomId", m_RoomId);
+
+    QByteArray con = json.json_to_string();
+    slot_SendRQ(con.data());
+
     // 赋值房间号为无房间状态
     m_RoomId = 0;
 
     // 再次打开界面
     m_pWeChat->showNormal();
+
 //    m_pRoom->showNormal();
 }

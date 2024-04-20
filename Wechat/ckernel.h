@@ -35,6 +35,8 @@ class CKernel : public QObject
     void DealRegRs(char* con);
     void DealCreateRoomRs(char* con);
     void DealJoinRoomRs(char* con);
+    void DealJoinInfo(char* con);
+    void DealLeaveInfo(char* con);
 
 
 public:
