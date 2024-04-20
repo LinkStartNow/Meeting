@@ -16,6 +16,12 @@ WeChatDialog::~WeChatDialog()
     delete ui;
 }
 
+void WeChatDialog::SetInfo(QString name, int icon)
+{
+    ui->lb_name->setText(name);
+
+}
+
 void WeChatDialog::closeEvent(QCloseEvent *event)
 {
     qDebug() << __func__;
@@ -28,5 +34,19 @@ void WeChatDialog::closeEvent(QCloseEvent *event)
         // 忽略
         event->ignore();
     }
+}
+
+
+void WeChatDialog::on_pb_create_clicked()
+{
+    qDebug() << __func__;
+    Q_EMIT sig_create();
+}
+
+
+void WeChatDialog::on_pb_join_clicked()
+{
+    qDebug() << __func__;
+    Q_EMIT sig_join();
 }
 

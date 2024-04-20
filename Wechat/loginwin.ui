@@ -54,7 +54,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -100,7 +100,7 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;请输入密码&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
-            <string/>
+            <string>123</string>
            </property>
            <property name="echoMode">
             <enum>QLineEdit::Password</enum>
@@ -224,7 +224,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;用户名由数字、字符、下划线组成&lt;/p&gt;&lt;p&gt;长度不超过10&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>不知道.</string>
+          <string>想不到.</string>
          </property>
          <property name="placeholderText">
           <string/>
@@ -237,7 +237,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;请输入11位手机号&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>15958206062</string>
+          <string>13456789000</string>
          </property>
          <property name="placeholderText">
           <string/>

@@ -4,6 +4,9 @@
 #include<QJsonObject>
 #include<QJsonDocument>
 #include<QJsonValue>
+#include<QJsonArray>
+#include <QDebug>
+#include <QVector>
 
 class CJson
 {
@@ -44,6 +47,15 @@ public:
     QByteArray json_get_byte_array( const char* key ){
         return json.value(key).toString().toLatin1();
     }
+    QVector<int> json_get_int_list(const char* key)
+    {
+        QJsonArray array = json.value(key).toArray();
+        QVector<int> res;
+        for (auto v: array) {
+            res.append(v.toInt());
+        }
+        return res;
+    }
     void json_add_value( const char* key , int value)
     {
         json.insert( key , value );
@@ -51,6 +63,13 @@ public:
     void json_add_value( const char* key , const char* value)
     {
         json.insert( key , value );
+    }
+    void json_add_value( const char* key , std::vector<int> value)
+    {
+        // 创建一个空的 QJsonArray
+        QJsonArray jsonArray;
+        for (int x: value) jsonArray.append(x);
+        json.insert(key, jsonArray);
     }
 
     QByteArray json_to_string()

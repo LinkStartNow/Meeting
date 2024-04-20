@@ -1,5 +1,16 @@
 <RCC>
     <qresource prefix="/">
         <file>images/register.png</file>
+        <file>tx/5.png</file>
+        <file>tx/12.png</file>
+        <file>tx/14.png</file>
+        <file>tx/19.png</file>
+        <file>tx/21.png</file>
+        <file>tx/36.jpg</file>
+        <file>images/color.png</file>
+        <file>images/down.png</file>
+        <file>images/right.png</file>
+        <file>images/sett.png</file>
+        <file>tx/37.jpg</file>
     </qresource>
 </RCC>

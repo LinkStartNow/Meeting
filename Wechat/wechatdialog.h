@@ -16,8 +16,16 @@ public:
     WeChatDialog(QWidget *parent = nullptr);
     ~WeChatDialog();
 
+    void SetInfo(QString name, int icon = 1);
+
 signals:
     void sig_destroy();
+    void sig_create();
+    void sig_join();
+
+private slots:
+    void on_pb_create_clicked();
+    void on_pb_join_clicked();
 
 private:
     Ui::WeChatDialog *ui;

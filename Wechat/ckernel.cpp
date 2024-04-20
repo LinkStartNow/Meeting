@@ -10,8 +10,10 @@ void CKernel::SetProFun()
 
     memset(m_ProToFun, 0, sizeof (m_ProToFun));
 
-    FUNMAP(LOG_RS) = std::bind(&CKernel::DealLoginRs, this, std::placeholders::_1);
-    FUNMAP(REG_RS) = std::bind(&CKernel::DealRegRs, this, std::placeholders::_1);
+    FUNMAP(LOG_RS)          = std::bind(&CKernel::DealLoginRs, this, std::placeholders::_1);
+    FUNMAP(REG_RS)          = std::bind(&CKernel::DealRegRs, this, std::placeholders::_1);
+    FUNMAP(CREATE_ROOM_RS)  = std::bind(&CKernel::DealCreateRoomRs, this, std::placeholders::_1);
+    FUNMAP(JOIN_ROOM_RS)    = std::bind(&CKernel::DealJoinRoomRs, this, std::placeholders::_1);
 }
 
 #include <QFileInfo>
@@ -60,10 +62,15 @@ void CKernel::DealLoginRs(char *con)
     int result = json.json_get_int("result");
     switch (result) {
     case LOG_SUCCESS: {
+        QString name = json.json_get_string("name");
         QMessageBox::information(nullptr, "提示", QString("用户名:%1, 个性签名:%2, id:%3")
-                                 .arg(json.json_get_string("name"))
+                                 .arg(name)
                                  .arg(json.json_get_string("feeling"))
-                                 .arg(json.json_get_string("id")));
+                                 .arg(json.json_get_int("id")));
+        m_UserId = json.json_get_int("id");
+        m_pWeChat->SetInfo(name);
+        m_pLogin->hide();
+        m_pWeChat->showNormal();
         break;
     }
     case USER_MISS: {
@@ -101,6 +108,56 @@ void CKernel::DealRegRs(char *con)
     }
 }
 
+void CKernel::DealCreateRoomRs(char *con)
+{
+    qDebug() << __func__;
+
+    CJson json(con);
+    delete [] con, con = nullptr;
+
+    m_RoomId = json.json_get_int("RoomId");
+    m_pRoom = new RoomDialog;
+    connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
+    m_pRoom->showNormal();
+    qDebug() << "room:" << m_RoomId;
+    m_pWeChat->hide();
+}
+
+#include <vector>
+void CKernel::DealJoinRoomRs(char *con)
+{
+    qDebug() << __func__;
+
+    CJson json(con);
+    delete [] con, con = nullptr;
+
+    int result = json.json_get_int("result");
+    switch (result) {
+    case JOIN_SUCCESS: {
+        m_RoomId = json.json_get_int("RoomId");
+        m_Member = json.json_get_int_list("MemberList");
+        m_pRoom = new RoomDialog;
+        qDebug() << "room:" << m_RoomId;
+        connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
+        m_pRoom->showNormal();
+        m_pWeChat->hide();
+        QString tmp;
+        for (int x: m_Member) tmp += QString(" %1").arg(x);
+        QMessageBox::about(m_pWeChat, "提示", "房间内有：" + tmp);
+//        QMessageBox::about(m_pWeChat, "提示", "加入成功，正在进入房间...");
+        break;
+    }
+    case JOIN_FAILED: {
+        QMessageBox::information(m_pWeChat, "提示", "加入房间失败！");
+        return;
+    }
+    case ROOM_NOTEXIST: {
+        QMessageBox::information(m_pWeChat, "提示", "房间号不存在，请确认后重新输入！");
+        break;
+    }
+    }
+}
+
 CKernel::CKernel(QObject *parent) : QObject(parent)
 {
 
@@ -114,7 +171,11 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     SetProFun();
 
     m_pWeChat = new WeChatDialog;
+    connect(m_pWeChat, &WeChatDialog::sig_create, this, &CKernel::slot_create);
+    connect(m_pWeChat, &WeChatDialog::sig_join, this, &CKernel::slot_join);
 //    m_pWeChat->show();
+
+
 
     connect(m_pWeChat, SIGNAL(sig_destroy()), this, SLOT(slot_destroy()));
 
@@ -167,4 +228,68 @@ void CKernel::slot_Deal(char *buf)
 void CKernel::slot_SendRQ(char * buf)
 {
     m_chat->Write(buf, strlen(buf) + 1);
+}
+
+void CKernel::slot_create()
+{
+    qDebug() << __func__;
+
+    // 判断是否在房间内
+    if (m_RoomId) {
+        QMessageBox::about(m_pWeChat, "提示", "在房间内，无法加入，请先退出");
+        return;
+    }
+
+    // 发命令创建房间
+    CJson json;
+    json.json_add_value("type", CREATE_ROOM_RQ);
+    json.json_add_value("id", m_UserId);
+
+    QByteArray con = json.json_to_string();
+    slot_SendRQ(con.data());
+}
+
+#include <QInputDialog>
+#include <QRegExp>
+void CKernel::slot_join()
+{
+    qDebug() << __func__;
+
+    // 判断是否在房间内
+    if (m_RoomId) {
+        QMessageBox::about(m_pWeChat, "提示", "在房间内，无法加入，请先退出");
+        return;
+    }
+
+    // 输入房间号
+    QString RoomId = QInputDialog::getText(m_pWeChat, "加入房间", "请输入房间号：");
+
+    // 判断房间号是否有效
+    QRegExp exp("^[0-9]{1,8}$");
+    if (!exp.exactMatch(RoomId)) {
+        // 无效则提示
+        QMessageBox::information(m_pWeChat, "提示", "请输入正确的房间号！(1-8位数字)");
+        return;
+    }
+    qDebug() << RoomId;
+
+    // 发命令加入房间
+    CJson json;
+    json.json_add_value("type", JOIN_ROOM_RQ);
+    json.json_add_value("id", m_UserId);
+    json.json_add_value("room_id", RoomId.toInt());
+
+    QByteArray con = json.json_to_string();
+    slot_SendRQ(con.data());
+}
+
+void CKernel::slot_QuitRoom()
+{
+    qDebug() << __func__;
+    // 赋值房间号为无房间状态
+    m_RoomId = 0;
+
+    // 再次打开界面
+    m_pWeChat->showNormal();
+//    m_pRoom->showNormal();
 }
