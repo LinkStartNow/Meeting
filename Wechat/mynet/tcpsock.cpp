@@ -57,50 +57,85 @@ bool Tcpsock::Connect(const char* ip, const int port)
 
 bool Tcpsock::Write(char *buf, int size)
 {
-    int num;
-    if ((num = send(m_sock, (char*)&size, sizeof(size), 0)) == SOCKET_ERROR) {
-        qDebug() << "send size error:" << WSAGetLastError();
-        return false;
+    int num = 0;
+    int max = sizeof(int);
+    char* ssr = (char*)&size;
+    while (num < max) {
+        int t;
+        if ((t = send(m_sock, ssr + num, max - num, 0)) == SOCKET_ERROR) {
+            qDebug() << "send size error:" << WSAGetLastError();
+            return false;
+        }
+        num += t;
     }
+
     qDebug() << "send num:" << num;
 
-    if (send(m_sock, buf, size, 0) == SOCKET_ERROR) {
-        qDebug() << "send buf error:" << WSAGetLastError();
-        return false;
+    num = 0;
+    max = size;
+    while (num < max) {
+        int t;
+        if ((t = send(m_sock, buf + num, max - num, 0)) == SOCKET_ERROR) {
+            qDebug() << "send size error:" << WSAGetLastError();
+            return false;
+        }
+        num += t;
     }
+//    if (send(m_sock, buf, size, 0) == SOCKET_ERROR) {
+//        qDebug() << "send buf error:" << WSAGetLastError();
+//        return false;
+//    }
     return true;
 }
 
 bool Tcpsock::Read()
 {
-    static int num = 0; // 成功读取的字节数
-    static int size = 0; // 获取buf大小
-    if ((num = recv(m_sock, (char*)&size, sizeof(int), 0)) == SOCKET_ERROR) {
-        qDebug() << "recv size error:" << WSAGetLastError();
-        return false;
+    int num = 0; // 成功读取的字节数
+    int size = 0; // 获取buf大小
+    int max = sizeof(int);
+    char sz[4];
+    while (num < max) {
+        int t;
+        if ((t = recv(m_sock, sz + num, max - num, 0)) == SOCKET_ERROR) {
+            qDebug() << "recv size error:" << WSAGetLastError();
+            return false;
+        }
+        num += t;
     }
 
-    if (num <= 0) {
+    max = *(int*)sz;
+
+    if (max <= 0) {
         qDebug() << "recv size failed" << WSAGetLastError();
         return false;
     }
 
-    char* buf = new char[size];
+    char* buf = new char[max];
+    num = 0;
 
 //    if (num > size) {
 //        qDebug() << "buf size is so small";
 //        return false;
 //    }
 
-    if ((num = recv(m_sock, buf, size, 0)) == SOCKET_ERROR) {
-        qDebug() << "recv buf error:" << WSAGetLastError();
-        return false;
+    while (num < max) {
+        int t;
+        if ((t = recv(m_sock, buf + num, max - num, 0)) == SOCKET_ERROR) {
+            qDebug() << "recv size error:" << WSAGetLastError();
+            return false;
+        }
+        num += t;
     }
 
-    if (num <= 0) {
-        qDebug() << "recv content failed" << WSAGetLastError();
-        return false;
-    }
+//    if ((num = recv(m_sock, buf, size, 0)) == SOCKET_ERROR) {
+//        qDebug() << "recv buf error:" << WSAGetLastError();
+//        return false;
+//    }
+
+//    if (num <= 0) {
+//        qDebug() << "recv content failed" << WSAGetLastError();
+//        return false;
+//    }
 
     Q_EMIT sig_Deal(buf);
 

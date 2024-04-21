@@ -243,7 +243,7 @@ void CKernel::slot_Deal(char *buf)
 {
     qDebug() << __func__;
     CJson json(buf);
-    delete [] buf;
+//    delete [] buf;
 
     int type = json.json_get_int("type");
 
