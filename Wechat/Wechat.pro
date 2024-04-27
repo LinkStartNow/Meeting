@@ -13,6 +13,7 @@ SOURCES += \
     loginwin.cpp \
     main.cpp \
     roomdialog.cpp \
+    usershow.cpp \
     wechatdialog.cpp
 
 HEADERS += \
@@ -20,11 +21,13 @@ HEADERS += \
     ckernel.h \
     loginwin.h \
     roomdialog.h \
+    usershow.h \
     wechatdialog.h
 
 FORMS += \
     loginwin.ui \
     roomdialog.ui \
+    usershow.ui \
     wechatdialog.ui
 
 include(mynet/mynet.pri)

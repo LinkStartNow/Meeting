@@ -17,15 +17,15 @@ class CKernel : public QObject
 //    using fun = void(CKernel::*)(char*);
     using fun = std::function<void(char*)>;
 
-    WeChatDialog*       m_pWeChat;
-    LoginWin*           m_pLogin;
-    RoomDialog*         m_pRoom;
-    Tcpsock*            m_chat;
-    QString             m_ip;
-    fun                 m_ProToFun[PRO_CNT];
-    QVector<int>        m_Member;
-    int                 m_RoomId = 0;
-    int                 m_UserId;
+    WeChatDialog*                       m_pWeChat;
+    LoginWin*                           m_pLogin;
+    RoomDialog*                         m_pRoom;
+    Tcpsock*                            m_chat;
+    QString                             m_ip;
+    fun                                 m_ProToFun[PRO_CNT];
+    QVector<int>                        m_Member;
+    int                                 m_RoomId = 0;
+    int                                 m_UserId;
 
     void SetProFun();
     void InitConfig();

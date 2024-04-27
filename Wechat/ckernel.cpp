@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "cjson.h"
 #include <QMessageBox>
+#include "usershow.h"
 
 #define FUNMAP(a) m_ProToFun[a - PRO_BASE]
 
@@ -118,12 +119,19 @@ void CKernel::DealCreateRoomRs(char *con)
     delete [] con, con = nullptr;
 
     m_RoomId = json.json_get_int("RoomId");
-    m_pRoom = new RoomDialog;
-    m_pRoom->SetInfo(QString::number(m_RoomId));
-    connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
+//    m_pRoom = new RoomDialog;
+    m_pRoom->SetInfo(QString("房间号：%1").arg(m_RoomId));
+//    connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
     m_pRoom->showNormal();
     qDebug() << "room:" << m_RoomId;
     m_pWeChat->hide();
+
+    // 测试item添加
+//    for (int i = 0; i < 10; ++i) {
+//        UserShow* item = new UserShow;
+//        item->SetInfo(QString("测试用户%1").arg(i), 233);
+//        m_pRoom->AddUser(item);
+//    }
 }
 
 #include <vector>
@@ -141,15 +149,13 @@ void CKernel::DealJoinRoomRs(char *con)
         m_Member = json.json_get_int_list("MemberList");
 
         // 创建并初始化房间
-        m_pRoom = new RoomDialog;
         m_pRoom->SetInfo(QString::number(m_RoomId));
         qDebug() << "room:" << m_RoomId;
-        connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
         m_pRoom->showNormal();
         m_pWeChat->hide();
-        QString tmp;
-        for (int x: m_Member) tmp += QString(" %1").arg(x);
-        QMessageBox::about(m_pWeChat, "提示", "房间内有：" + tmp);
+//        QString tmp;
+//        for (int x: m_Member) tmp += QString(" %1").arg(x);
+//        QMessageBox::about(m_pWeChat, "提示", "房间内有：" + tmp);
 //        QMessageBox::about(m_pWeChat, "提示", "加入成功，正在进入房间...");
         break;
     }
@@ -171,9 +177,13 @@ void CKernel::DealJoinInfo(char *con)
     CJson json(con);
     delete [] con, con = nullptr;
 
-    int id = json.json_get_int("id");
+    int id          = json.json_get_int("id");
+    int icon        = json.json_get_int("icon");
+    QString name    = json.json_get_string("name");
 
-    QMessageBox::about(m_pRoom, "提示", QString("欢迎%1加入房间！").arg(id));
+    m_pRoom->AddUser(id, icon, name);
+
+    QMessageBox::about(m_pRoom, "提示", QString("欢迎%1加入房间！").arg(name));
 }
 
 void CKernel::DealLeaveInfo(char *con)
@@ -184,8 +194,17 @@ void CKernel::DealLeaveInfo(char *con)
     delete [] con, con = nullptr;
 
     int id = json.json_get_int("UserId");
+//    int roomid = json.json_get_int("room_id");
 
-    QMessageBox::about(m_pRoom, "提示", QString("%1悄无声息地离开了……").arg(id));
+    QMessageBox::about(m_pRoom, "提示", QString("%1悄无声息地离开了……").arg(m_pRoom->GetNameById(id)));
+
+    // 从显示列表中去掉用户
+    m_pRoom->Erase(id);
+
+//    auto& t = m_mapIdToUserShow[id];
+//    t->hide();
+//    delete t; t = nullptr;
+//    m_mapIdToUserShow.erase(id);
 }
 
 CKernel::CKernel(QObject *parent) : QObject(parent)
@@ -200,15 +219,15 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     // 绑定函数
     SetProFun();
 
+    // 创建主交互窗口
     m_pWeChat = new WeChatDialog;
     connect(m_pWeChat, &WeChatDialog::sig_create, this, &CKernel::slot_create);
     connect(m_pWeChat, &WeChatDialog::sig_join, this, &CKernel::slot_join);
 //    m_pWeChat->show();
-
-
-
     connect(m_pWeChat, SIGNAL(sig_destroy()), this, SLOT(slot_destroy()));
 
+
+    // 创建通信tcp对象
     m_chat = new Tcpsock;
     if (!m_chat->Connect(m_ip.toStdString().c_str(), PORT)) {
         qDebug() << "connect error";
@@ -216,10 +235,16 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     }
     connect(m_chat, &Tcpsock::sig_Deal, this, &CKernel::slot_Deal);
 
+
+    // 创建登录窗口
     m_pLogin = new LoginWin;
     m_pLogin->show();
     connect(m_pLogin, &LoginWin::sig_destroy, this, &CKernel::slot_destroy);
     connect(m_pLogin, &LoginWin::sig_SendRQ, this, &CKernel::slot_SendRQ);
+
+    // 创建房间
+    m_pRoom = new RoomDialog;
+    connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
 }
 
 void CKernel::slot_destroy()
@@ -328,8 +353,13 @@ void CKernel::slot_QuitRoom()
     // 赋值房间号为无房间状态
     m_RoomId = 0;
 
+    // 清空房间
+    m_pRoom->ClearUser();
+
     // 再次打开界面
     m_pWeChat->showNormal();
+
+    // todo：关闭音频视频
 
 //    m_pRoom->showNormal();
 }
