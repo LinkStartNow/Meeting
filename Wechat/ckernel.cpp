@@ -17,6 +17,10 @@ void CKernel::SetProFun()
     FUNMAP(JOIN_ROOM_RS)     = std::bind(&CKernel::DealJoinRoomRs, this, std::placeholders::_1);
     FUNMAP(JOIN_INFO)        = std::bind(&CKernel::DealJoinInfo, this, std::placeholders::_1);
     FUNMAP(LEAVE_INFO)       = std::bind(&CKernel::DealLeaveInfo, this, std::placeholders::_1);
+
+#if !USE_NO_JSON_AUDIO
+    FUNMAP(AUDIO)            = std::bind(&CKernel::DealAudio, this, std::placeholders::_1);
+#endif
 }
 
 #include <QFileInfo>
@@ -204,8 +208,35 @@ void CKernel::DealLeaveInfo(char *con)
 //    auto& t = m_mapIdToUserShow[id];
 //    t->hide();
 //    delete t; t = nullptr;
-//    m_mapIdToUserShow.erase(id);
+    //    m_mapIdToUserShow.erase(id);
 }
+
+#if USE_NO_JSON_AUDIO
+void CKernel::DealAudio(char *buf, int len)
+{
+    len -= 3 * sizeof(int);
+    buf += 3 * sizeof(int);
+
+    QByteArray res;
+    res.append(buf, len);
+
+    m_pAudio_out->slot_net_rx(res);
+
+    delete[] buf;
+}
+
+
+#else
+void CKernel::DealAudio(char *con)
+{
+    CJson json(con);
+    delete [] con, con = nullptr;
+
+    QByteArray buf = QByteArray::fromBase64( json.json_get_byte_array("audio"));
+
+    m_pAudio_out->slot_net_rx(buf);
+}
+#endif
 
 CKernel::CKernel(QObject *parent) : QObject(parent)
 {
@@ -240,12 +271,22 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     m_pLogin = new LoginWin;
     m_pLogin->show();
     connect(m_pLogin, &LoginWin::sig_destroy, this, &CKernel::slot_destroy);
-    connect(m_pLogin, &LoginWin::sig_SendRQ, this, &CKernel::slot_SendRQ);
+    connect(m_pLogin, SIGNAL(sig_SendRQ(char*)), this, SLOT(slot_SendRQ(char*)));
 
     // 创建房间
     m_pRoom = new RoomDialog;
     connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
+    connect(m_pRoom, &RoomDialog::sig_AudioEnabled, this, &CKernel::slot_AudioEnabled);
+    connect(m_pRoom, &RoomDialog::sig_AudioUnabled, this, &CKernel::slot_AudioUnabled);
+
+    // 创建播放音频对象
+    m_pAudio_out = new Audio_Write;
+    m_pAudio_in = new Audio_Read;
+
+    connect(m_pAudio_in, &Audio_Read::SIG_audioFrame, this, &CKernel::slot_AudioSend);
+//    connect(m_pAudio_in, &Audio_Read::SIG_audioFrame, m_pAudio_out, &Audio_Write::slot_net_rx);
 }
+
 
 void CKernel::slot_destroy()
 {
@@ -264,9 +305,16 @@ void CKernel::slot_destroy()
     }
 }
 
-void CKernel::slot_Deal(char *buf)
+void CKernel::slot_Deal(char *buf, int len)
 {
     qDebug() << __func__;
+
+#if USE_NO_JSON_AUDIO
+    if (*(int*)buf == AUDIO) {
+        DealAudio(buf, len);
+        return;
+    }
+#endif
     CJson json(buf);
 //    delete [] buf;
 
@@ -279,6 +327,14 @@ void CKernel::slot_Deal(char *buf)
 
     FUNMAP(type)(buf);
 }
+
+#if USE_NO_JSON_AUDIO
+void CKernel::slot_SendRQ(char *buf, int len)
+{
+    qDebug() << QString("发送了：%1").arg(len);
+    m_chat->Write(buf, len);
+}
+#endif
 
 void CKernel::slot_SendRQ(char * buf)
 {
@@ -361,5 +417,57 @@ void CKernel::slot_QuitRoom()
 
     // todo：关闭音频视频
 
-//    m_pRoom->showNormal();
+    //    m_pRoom->showNormal();
+}
+
+void CKernel::slot_AudioEnabled()
+{
+    m_pAudio_in->start();
+}
+
+void CKernel::slot_AudioUnabled()
+{
+    m_pAudio_in->pause();
+}
+
+void CKernel::slot_AudioSend(QByteArray buf)
+{
+    qDebug() << __func__;
+//    qDebug() << QString("要发送的音频大小为%1").arg(buf.size());
+#if USE_NO_JSON_AUDIO
+    // 序列化
+    int num = buf.size() + 3 * sizeof(int);
+    char* tmp = new char[num];
+    char* ssr = tmp;
+
+    // 写入类型
+    *(int*)ssr = AUDIO;
+    ssr += sizeof(int);
+
+    *(int*)ssr = m_UserId;
+    ssr += sizeof(int);
+
+    *(int*)ssr = m_RoomId;
+    ssr += sizeof(int);
+
+    memcpy(ssr, buf.data(), buf.size());
+
+    qDebug() << QString("size of new = %1").arg(strlen(tmp));
+
+    slot_SendRQ(tmp, num);
+    delete[] tmp;
+#else
+    CJson json;
+    json.json_add_value("type", AUDIO);
+
+    json.json_add_value("UserId", m_UserId);
+    json.json_add_value("RoomId", m_RoomId);
+    json.json_add_value("audio", buf.toBase64().data());
+
+    QByteArray con = json.json_to_string();
+
+    qDebug() << QString("buf = %1").arg(buf.size());
+    qDebug() << QString("json %1").arg(con.size());
+    slot_SendRQ(con.data());
+#endif
 }

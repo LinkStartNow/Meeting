@@ -38,7 +38,7 @@ public:
     void Close();
 
 signals:
-    void sig_Deal(char* buf);
+    void sig_Deal(char* buf, int len);
 };
 
 #endif // TCPSOCK_H

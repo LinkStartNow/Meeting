@@ -85,3 +85,16 @@ void RoomDialog::on_pb_exit_clicked()
     this->close();
 }
 
+
+void RoomDialog::on_cb_audio_stateChanged(int arg1)
+{
+    if (ui->cb_audio->isChecked()) {
+        Q_EMIT sig_AudioEnabled();
+        qDebug() << "音频已经打开";
+    }
+    else {
+        Q_EMIT sig_AudioUnabled();
+        qDebug() << "音频已经关闭";
+    }
+}
+

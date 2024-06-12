@@ -137,7 +137,7 @@ bool Tcpsock::Read()
 //        return false;
 //    }
 
-    Q_EMIT sig_Deal(buf);
+    Q_EMIT sig_Deal(buf, max);
 
     return true;
 }

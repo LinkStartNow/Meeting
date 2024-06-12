@@ -32,6 +32,7 @@ FORMS += \
 
 include(mynet/mynet.pri)
 include(md5/md5.pri)
+include(AudioApi/audioapi.pri)
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

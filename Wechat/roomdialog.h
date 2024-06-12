@@ -25,9 +25,13 @@ public:
 
 signals:
     void sig_QuitRoom();
+    void sig_AudioEnabled();
+    void sig_AudioUnabled();
 
 private slots:
     void on_pb_exit_clicked();
+
+    void on_cb_audio_stateChanged(int arg1);
 
 private:
     Ui::RoomDialog *ui;

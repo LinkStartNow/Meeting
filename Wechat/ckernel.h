@@ -10,6 +10,8 @@
 #include <functional>
 #include <QVector>
 #include "cjson.h"
+#include "AudioApi/audio_read.h"
+#include "AudioApi/audio_write.h"
 
 class CKernel : public QObject
 {
@@ -26,6 +28,8 @@ class CKernel : public QObject
     QVector<int>                        m_Member;
     int                                 m_RoomId = 0;
     int                                 m_UserId;
+    Audio_Write*                        m_pAudio_out;
+    Audio_Read*                         m_pAudio_in;
 
     void SetProFun();
     void InitConfig();
@@ -37,6 +41,12 @@ class CKernel : public QObject
     void DealJoinRoomRs(char* con);
     void DealJoinInfo(char* con);
     void DealLeaveInfo(char* con);
+
+#if USE_NO_JSON_AUDIO
+    void DealAudio(char*, int);
+#else
+    void DealAudio(char* con);
+#endif
 
 
 public:
@@ -50,10 +60,15 @@ private slots:
     void slot_destroy();
 
     // 处理的槽
-    void slot_Deal(char* buf);
+    void slot_Deal(char* buf, int len);
 
+#if USE_NO_JSON_AUDIO
+    // 发送音频信息
+    void slot_SendRQ(char*, int);
+#endif
     // 发送网络信息
     void slot_SendRQ(char*);
+
 
     // 创建房间
     void slot_create();
@@ -63,6 +78,13 @@ private slots:
 
     // 退出房间
     void slot_QuitRoom();
+
+    // 操作做了音频选项
+    void slot_AudioEnabled();
+    void slot_AudioUnabled();
+
+    // 发送音频
+    void slot_AudioSend(QByteArray buf);
 signals:
 
 };
