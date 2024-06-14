@@ -6,6 +6,8 @@
 
 > 实现json传递数组的客户端与服务端封装
 
+---
+
 ### 问题
 
 > 服务端内存泄漏出现bug，由于json数组无法回收内存
@@ -39,6 +41,8 @@ void json_add_value( const char * key,  std::vector<int>& value){
 
 > 实现音频通信
 
+---
+
 ### 问题
 
 > 用json封装发送音频的网络包，服务端出现崩溃现象
@@ -56,3 +60,144 @@ void json_add_value( const char * key,  std::vector<int>& value){
 #### 优化
 
 > 单独将音频包通过序列化的方式来传播发送，再通过反序列化来解析
+
+---
+
+## 2024.6.13
+
+### 进展
+
+> 云服务器搭建
+
+---
+
+### 搭建步骤
+
+#### 1、配置MySQL
+
+1. 安装MySQL
+
+	1. 更新apt
+
+		输入命令`apt-get update`
+
+	2. 安装服务端
+
+		输入命令` apt-get install mysql-server`
+
+	3. 安装客户端
+
+		输入命令`apt-get install mysql-client`
+
+	4. 安装开发库
+
+		输入命令`apt-get install libmysqlclient-dev`
+
+	5. 检查是否安装成功
+
+		输入命令`netstat -tap | grep mysql`
+
+		如果处于监听状态则说明安装成功了
+
+2. 配置MySQL（让MySQL支持中文）
+
+	1. 检查当前编码
+
+		输入命令`show variables like '%char%';`
+
+		发现数据库的数据集为latin1，我们需要改成utf8
+
+	2. 修改配置文件
+
+		`vi /etc/mysql/mysql.conf.d/mysqld.cnf`
+
+		[mysqld]后面添加 `character_set_server=utf8 `，保存并退出
+
+	3. 重启MySQL
+
+		输入命令`service mysql restart`
+
+	4. 重新登录MySQL检查一遍编码
+
+		发现对应的`character_set_database`已经变成了`utf8`
+
+3. 建表
+
+	```mysql
+	create table t_user (
+		id int primary key auto_increment,
+		tel varchar(15)	unique,
+		pass varchar(40),
+		icon int default 0,
+		feeling varchar(100) default '这个人很懒，什么也没写',
+		name varchar(45) unique
+	);
+	```
+
+4. 修改表的字符集
+
+	```mysql
+	alter table t_user convert to charset utf8;
+	```
+
+---
+
+#### 2、配置Json环境
+
+1. 安装json
+
+	1. 将json安装包移动到远程机上去
+
+	2. 将json的安装包拷贝到`/usr/local`去
+
+	3. 到目标目录下去解压
+
+		`tar -xvf json-c-0.9.tar.gz`
+
+		如果移动过去的是一个zip文件，则先解压zip文件，`unzip 文件名`
+
+		也许unzip都没有安装，则先安装unzip，`apt install unzip`
+
+	4. 进入到解压后的目录中
+
+		`cd json-c-0.9`
+
+	5. 配置文件并安装
+
+		先`./configure`，然后`make`，最后`make install`
+
+2. 配置动态库文件
+
+	我们这是第一次安装库，所以操作系统并不知道从哪找动态库文件
+
+	所以我们可以手动配置一下
+
+	1. 打开配置文件：`sudo vim  /etc/ld.so.conf`
+
+	2. 添加对应库所在路径：`include /etc/ld.so.conf.d/*.conf 
+		/usr/local/lib`
+
+	3. 保存退出，并加载
+
+		`ldconfig`
+
+
+---
+
+### 问题
+
+> 音频通话卡顿，延迟巨高
+
+#### 优化方案
+
+1. 非阻塞通信
+
+2. UDP通信
+
+	需要克服内网穿透问题，因为本地的主机为私网，而云服务器为公网IP，所以需要做内网穿透才能实现服务端与本地通信
+
+---
+
+### 功能优化
+
+> 添加了复制房间号的功能
