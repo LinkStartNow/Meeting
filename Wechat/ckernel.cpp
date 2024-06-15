@@ -17,6 +17,7 @@ void CKernel::SetProFun()
     FUNMAP(JOIN_ROOM_RS)     = std::bind(&CKernel::DealJoinRoomRs, this, std::placeholders::_1);
     FUNMAP(JOIN_INFO)        = std::bind(&CKernel::DealJoinInfo, this, std::placeholders::_1);
     FUNMAP(LEAVE_INFO)       = std::bind(&CKernel::DealLeaveInfo, this, std::placeholders::_1);
+    FUNMAP(CLOSE_VEDIO)      = std::bind(&CKernel::DealVedioClose, this, std::placeholders::_1);
 
 #if !USE_NO_JSON_AUDIO
     FUNMAP(AUDIO)            = std::bind(&CKernel::DealAudio, this, std::placeholders::_1);
@@ -215,6 +216,17 @@ void CKernel::DealLeaveInfo(char *con)
     //    m_mapIdToUserShow.erase(id);
 }
 
+void CKernel::DealVedioClose(char *con)
+{
+    CJson json(con);
+    delete [] con, con = nullptr;
+
+    int id = json.json_get_int("UserId");
+
+    QImage img;
+    m_pRoom->SetImgById(id, img);
+}
+
 #if USE_NO_JSON_AUDIO
 void CKernel::DealAudio(char *buf, int len)
 {
@@ -314,7 +326,7 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     connect(m_pRoom, &RoomDialog::sig_AudioEnabled, this, &CKernel::slot_AudioEnabled);
     connect(m_pRoom, &RoomDialog::sig_AudioUnabled, this, &CKernel::slot_AudioUnabled);
     connect(m_pRoom, &RoomDialog::sig_VideoEnabled, m_pVideo_in, &VideoRead::slot_openVideo);
-    connect(m_pRoom, &RoomDialog::sig_VideoUnabled, m_pVideo_in, &VideoRead::slot_closeVideo);
+    connect(m_pRoom, &RoomDialog::sig_VideoUnabled, this, &CKernel::slot_VedioUnabled);
 }
 
 
@@ -465,6 +477,26 @@ void CKernel::slot_AudioEnabled()
 void CKernel::slot_AudioUnabled()
 {
     m_pAudio_in->pause();
+}
+
+// 关闭视频播放
+void CKernel::slot_VedioUnabled()
+{
+    // 关闭视频采集
+    m_pVideo_in->slot_closeVideo();
+
+
+    // 本地视频显示黑屏
+    QImage img;
+    m_pRoom->SetImgById(m_UserId, img);
+
+    CJson json;
+    json.json_add_value("type", CLOSE_VEDIO);
+    json.json_add_value("UserId", m_UserId);
+    json.json_add_value("RoomId", m_RoomId);
+
+    QByteArray con = json.json_to_string();
+    slot_SendRQ(con.data());
 }
 
 void CKernel::slot_AudioSend(QByteArray buf)

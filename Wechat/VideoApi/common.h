@@ -7,7 +7,7 @@
 #include"opencv2\imgproc\types_c.h"
 
 //using namespace cv;
-#define FRAME_RATE (25)
+#define FRAME_RATE (10)
 
 
 

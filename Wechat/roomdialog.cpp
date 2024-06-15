@@ -131,8 +131,6 @@ void RoomDialog::on_cb_video_stateChanged(int arg1)
     }
     else {
         Q_EMIT sig_VideoUnabled();
-        QImage img;
-        SetImgById(m_Userid, img);
         qDebug() << "视频已经关闭";
     }
 }

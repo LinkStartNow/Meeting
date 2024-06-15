@@ -43,6 +43,7 @@ class CKernel : public QObject
     void DealJoinRoomRs(char* con);
     void DealJoinInfo(char* con);
     void DealLeaveInfo(char* con);
+    void DealVedioClose(char* con);
 
 #if USE_NO_JSON_AUDIO
     void DealAudio(char*, int);
@@ -85,6 +86,9 @@ private slots:
     // 操作做了音频选项
     void slot_AudioEnabled();
     void slot_AudioUnabled();
+
+    // 关闭音频
+    void slot_VedioUnabled();
 
 
     // 发送音频
