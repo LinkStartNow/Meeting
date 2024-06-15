@@ -184,7 +184,7 @@ void json_add_value( const char * key,  std::vector<int>& value){
 
 ---
 
-### 问题
+### 问题（未成功解决）
 
 > 音频通话卡顿，延迟巨高
 
@@ -210,7 +210,7 @@ void json_add_value( const char * key,  std::vector<int>& value){
 
 ### 进展
 
-> 完成了视频的采集与本地客户端的播放
+> 完成了视频通话部分
 
 ### 功能优化
 
