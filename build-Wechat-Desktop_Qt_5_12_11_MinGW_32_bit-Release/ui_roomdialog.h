@@ -32,6 +32,9 @@ public:
     QWidget *widget;
     QHBoxLayout *horizontalLayout_2;
     QLabel *lb_room;
+    QLabel *lb_room_id;
+    QPushButton *lb_copy;
+    QSpacerItem *horizontalSpacer_2;
     QPushButton *pb_hide;
     QPushButton *pb_show;
     QPushButton *pb_exit;
@@ -77,21 +80,31 @@ public:
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         lb_room = new QLabel(widget);
         lb_room->setObjectName(QString::fromUtf8("lb_room"));
-        QFont font;
-        font.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
-        font.setPointSize(12);
-        lb_room->setFont(font);
 
         horizontalLayout_2->addWidget(lb_room);
+
+        lb_room_id = new QLabel(widget);
+        lb_room_id->setObjectName(QString::fromUtf8("lb_room_id"));
+
+        horizontalLayout_2->addWidget(lb_room_id);
+
+        lb_copy = new QPushButton(widget);
+        lb_copy->setObjectName(QString::fromUtf8("lb_copy"));
+
+        horizontalLayout_2->addWidget(lb_copy);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer_2);
 
         pb_hide = new QPushButton(widget);
         pb_hide->setObjectName(QString::fromUtf8("pb_hide"));
         pb_hide->setMinimumSize(QSize(30, 30));
         pb_hide->setMaximumSize(QSize(30, 30));
-        QFont font1;
-        font1.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
-        font1.setPointSize(20);
-        pb_hide->setFont(font1);
+        QFont font;
+        font.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
+        font.setPointSize(20);
+        pb_hide->setFont(font);
 
         horizontalLayout_2->addWidget(pb_hide);
 
@@ -99,10 +112,10 @@ public:
         pb_show->setObjectName(QString::fromUtf8("pb_show"));
         pb_show->setMinimumSize(QSize(30, 30));
         pb_show->setMaximumSize(QSize(30, 30));
-        QFont font2;
-        font2.setFamily(QString::fromUtf8("\345\271\274\345\234\206"));
-        font2.setPointSize(16);
-        pb_show->setFont(font2);
+        QFont font1;
+        font1.setFamily(QString::fromUtf8("\345\271\274\345\234\206"));
+        font1.setPointSize(16);
+        pb_show->setFont(font1);
 
         horizontalLayout_2->addWidget(pb_show);
 
@@ -110,10 +123,14 @@ public:
         pb_exit->setObjectName(QString::fromUtf8("pb_exit"));
         pb_exit->setMinimumSize(QSize(30, 30));
         pb_exit->setMaximumSize(QSize(30, 30));
-        pb_exit->setFont(font1);
+        pb_exit->setFont(font);
 
         horizontalLayout_2->addWidget(pb_exit);
 
+        horizontalLayout_2->setStretch(0, 1);
+        horizontalLayout_2->setStretch(1, 1);
+        horizontalLayout_2->setStretch(2, 1);
+        horizontalLayout_2->setStretch(3, 10);
 
         verticalLayout->addWidget(widget);
 
@@ -181,10 +198,10 @@ public:
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
         widget_2->setMinimumSize(QSize(537, 35));
         widget_2->setMaximumSize(QSize(16777215, 35));
-        QFont font3;
-        font3.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
-        font3.setPointSize(10);
-        widget_2->setFont(font3);
+        QFont font2;
+        font2.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
+        font2.setPointSize(10);
+        widget_2->setFont(font2);
         widget_2->setStyleSheet(QString::fromUtf8(""));
         horizontalLayout_3 = new QHBoxLayout(widget_2);
         horizontalLayout_3->setSpacing(0);
@@ -229,7 +246,9 @@ public:
     void retranslateUi(QDialog *RoomDialog)
     {
         RoomDialog->setWindowTitle(QApplication::translate("RoomDialog", "Dialog", nullptr));
-        lb_room->setText(QApplication::translate("RoomDialog", "\346\210\277\351\227\264\345\217\267\357\274\23212345678", nullptr));
+        lb_room->setText(QApplication::translate("RoomDialog", "\346\210\277\351\227\264\345\217\267\357\274\232", nullptr));
+        lb_room_id->setText(QApplication::translate("RoomDialog", "1234567", nullptr));
+        lb_copy->setText(QApplication::translate("RoomDialog", "Copy", nullptr));
         pb_hide->setText(QApplication::translate("RoomDialog", "\344\270\200", nullptr));
         pb_show->setText(QApplication::translate("RoomDialog", "\345\217\243", nullptr));
         pb_exit->setText(QApplication::translate("RoomDialog", "X", nullptr));

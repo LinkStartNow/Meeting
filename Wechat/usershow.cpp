@@ -1,6 +1,7 @@
 #include "usershow.h"
 #include "ui_usershow.h"
 #include <QPainter>
+#include <QPixmap>
 
 UserShow::UserShow(QWidget *parent) :
     QWidget(parent),
@@ -22,6 +23,14 @@ void UserShow::SetInfo(QString name, int id)
     repaint();
 }
 
+void UserShow::SetImg(QImage &img)
+{
+    m_image = img;
+
+    // 启动刷新事件
+    update();
+}
+
 // 重绘事件
 void UserShow::paintEvent(QPaintEvent *event)
 {
@@ -34,5 +43,16 @@ void UserShow::paintEvent(QPaintEvent *event)
     // 画一个黑色矩形背景
     p.drawRect(-1, 0, this->width() + 1, this->height());
 
-    // todo 画视频帧
+    // 画视频帧
+    // 等比例缩放
+    m_image = m_image.scaled(this->width(), this->height(), Qt::KeepAspectRatio);
+
+    QPixmap pix = QPixmap::fromImage(m_image);
+
+    int x = this->width() - pix.width() >> 1;
+    int y = (this->height() - ui->lb_name->height() - pix.height() >> 1) + ui->lb_name->height();
+//    int y = 0;
+    p.drawPixmap(QPoint(x, y), pix);
+
+    p.end();
 }

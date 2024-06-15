@@ -4,7 +4,11 @@ Audio_Read::Audio_Read(QObject *parent) : QObject(parent)
 {
     //首先初始化设备
     //声卡采样格式
+#if USE_BETTER_AUDIO
+    format.setSampleRate(16000);
+#else
     format.setSampleRate(8000);
+#endif
     format.setChannelCount(1);
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
@@ -84,15 +88,22 @@ void Audio_Read::slot_readMore()
 
     QByteArray m_buffer(2048,0);
     qint64 len = audio_in->bytesReady();
-    if (len < 640)
+
+#if USE_BETTER_AUDIO
+    int size = 1280;
+#else
+    int size = 640;
+#endif
+
+    if (len < size)
     {
         return;
     }
     //从音频设备对应的缓冲区中读取 640字节
-    qint64 l = myBuffer_in->read(m_buffer.data(), 640);
+    qint64 l = myBuffer_in->read(m_buffer.data(), size);
     qDebug() << "l sizes:"<< l ;
     QByteArray frame;
-    frame.append(m_buffer.data(),640);
+    frame.append(m_buffer.data(),size);
 
     //以信号的形式发送
     Q_EMIT SIG_audioFrame( frame );

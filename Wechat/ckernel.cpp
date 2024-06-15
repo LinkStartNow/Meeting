@@ -124,7 +124,7 @@ void CKernel::DealCreateRoomRs(char *con)
 
     m_RoomId = json.json_get_int("RoomId");
 //    m_pRoom = new RoomDialog;
-    m_pRoom->SetInfo(QString("房间号：%1").arg(m_RoomId));
+    m_pRoom->SetInfo(QString::number(m_RoomId), m_UserId);
 //    connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
     m_pRoom->showNormal();
     qDebug() << "room:" << m_RoomId;
@@ -153,10 +153,12 @@ void CKernel::DealJoinRoomRs(char *con)
         m_Member = json.json_get_int_list("MemberList");
 
         // 创建并初始化房间
-        m_pRoom->SetInfo(QString::number(m_RoomId));
+        m_pRoom->SetInfo(QString::number(m_RoomId), m_UserId);
         qDebug() << "room:" << m_RoomId;
         m_pRoom->showNormal();
         m_pWeChat->hide();
+
+        QMessageBox::about(m_pWeChat, "提示", "加入房间成功，欢迎！");
 //        QString tmp;
 //        for (int x: m_Member) tmp += QString(" %1").arg(x);
 //        QMessageBox::about(m_pWeChat, "提示", "房间内有：" + tmp);
@@ -184,10 +186,12 @@ void CKernel::DealJoinInfo(char *con)
     int id          = json.json_get_int("id");
     int icon        = json.json_get_int("icon");
     QString name    = json.json_get_string("name");
+    int flag        = json.json_get_int("flag");
 
     m_pRoom->AddUser(id, icon, name);
 
-    QMessageBox::about(m_pRoom, "提示", QString("欢迎%1加入房间！").arg(name));
+    if (flag != NEW_IN && id != m_UserId)
+        QMessageBox::about(m_pRoom, "提示", QString("欢迎%1加入房间！").arg(name));
 }
 
 void CKernel::DealLeaveInfo(char *con)
@@ -273,18 +277,23 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     connect(m_pLogin, &LoginWin::sig_destroy, this, &CKernel::slot_destroy);
     connect(m_pLogin, SIGNAL(sig_SendRQ(char*)), this, SLOT(slot_SendRQ(char*)));
 
+    // 创建播放音频和采集音频对象
+    m_pAudio_out = new Audio_Write;
+    m_pAudio_in = new Audio_Read;
+
+    connect(m_pAudio_in, &Audio_Read::SIG_audioFrame, this, &CKernel::slot_AudioSend);
+
+    // 创建视频采集对象
+    m_pVideo_in = new VideoRead;
+    connect(m_pVideo_in, &VideoRead::SIG_sendVideoFrame, this, &CKernel::slot_sendVideoFrame);
+
     // 创建房间
     m_pRoom = new RoomDialog;
     connect(m_pRoom, &RoomDialog::sig_QuitRoom, this, &CKernel::slot_QuitRoom);
     connect(m_pRoom, &RoomDialog::sig_AudioEnabled, this, &CKernel::slot_AudioEnabled);
     connect(m_pRoom, &RoomDialog::sig_AudioUnabled, this, &CKernel::slot_AudioUnabled);
-
-    // 创建播放音频对象
-    m_pAudio_out = new Audio_Write;
-    m_pAudio_in = new Audio_Read;
-
-    connect(m_pAudio_in, &Audio_Read::SIG_audioFrame, this, &CKernel::slot_AudioSend);
-//    connect(m_pAudio_in, &Audio_Read::SIG_audioFrame, m_pAudio_out, &Audio_Write::slot_net_rx);
+    connect(m_pRoom, &RoomDialog::sig_VideoEnabled, m_pVideo_in, &VideoRead::slot_openVideo);
+    connect(m_pRoom, &RoomDialog::sig_VideoUnabled, m_pVideo_in, &VideoRead::slot_closeVideo);
 }
 
 
@@ -415,7 +424,10 @@ void CKernel::slot_QuitRoom()
     // 再次打开界面
     m_pWeChat->showNormal();
 
-    // todo：关闭音频视频
+    // 关闭音频视频
+    m_pAudio_in->pause();
+    m_pVideo_in->slot_closeVideo();
+    m_pRoom->ClearCheck();
 
     //    m_pRoom->showNormal();
 }
@@ -470,4 +482,15 @@ void CKernel::slot_AudioSend(QByteArray buf)
     qDebug() << QString("json %1").arg(con.size());
     slot_SendRQ(con.data());
 #endif
+}
+
+void CKernel::slot_sendVideoFrame(QImage img)
+{
+    qDebug() << __func__;
+    // 显示图像
+    m_pRoom->SetImgById(m_UserId, img);
+
+    // todo:压缩图片
+
+    // todo:发送图片
 }

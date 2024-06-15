@@ -55,7 +55,7 @@
      <property name="styleSheet">
       <string notr="true"/>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,1,10,0,0,0">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -73,16 +73,37 @@
       </property>
       <item>
        <widget class="QLabel" name="lb_room">
-        <property name="font">
-         <font>
-          <family>微软雅黑</family>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
         <property name="text">
-         <string>房间号：12345678</string>
+         <string>房间号：</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lb_room_id">
+        <property name="text">
+         <string>1234567</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="lb_copy">
+        <property name="text">
+         <string>Copy</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="pb_hide">

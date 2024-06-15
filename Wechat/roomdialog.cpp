@@ -25,10 +25,11 @@ RoomDialog::~RoomDialog()
     delete ui;
 }
 
-void RoomDialog::SetInfo(QString RoomId)
+void RoomDialog::SetInfo(QString RoomId, int UserId)
 {
     setWindowTitle(QString("房间号：%1").arg(RoomId));
-    ui->lb_room->setText(RoomId);
+    ui->lb_room_id->setText(RoomId);
+    m_Userid = UserId;
 }
 
 void RoomDialog::AddUser(int id, int icon, QString name)
@@ -59,9 +60,24 @@ void RoomDialog::ClearUser()
     for (const auto& [x, y]: m_mapIdToUserShow) Erase(x);
 }
 
+void RoomDialog::SetImgById(int id, QImage &img)
+{
+    if (m_mapIdToUserShow.count(id)) {
+        UserShow* t = m_mapIdToUserShow[id];
+        t->SetImg(img);
+    }
+}
+
 QString RoomDialog::GetNameById(int id)
 {
     return  m_mapIdToUserShow[id]->GetName();
+}
+
+void RoomDialog::ClearCheck()
+{
+    ui->cb_audio->setCheckState(Qt::Unchecked);
+    ui->cb_video->setCheckState(Qt::Unchecked);
+    ui->cb_desk->setCheckState(Qt::Unchecked);
 }
 
 // 关闭事件
@@ -95,6 +111,29 @@ void RoomDialog::on_cb_audio_stateChanged(int arg1)
     else {
         Q_EMIT sig_AudioUnabled();
         qDebug() << "音频已经关闭";
+    }
+}
+
+#include <QClipboard>
+void RoomDialog::on_lb_copy_clicked()
+{
+    QClipboard* ssr = QApplication::clipboard();
+    ssr->setText(ui->lb_room_id->text());
+    QMessageBox::about(this, "提示", "房间号复制成功！");
+}
+
+
+void RoomDialog::on_cb_video_stateChanged(int arg1)
+{
+    if (ui->cb_video->isChecked()) {
+        Q_EMIT sig_VideoEnabled();
+        qDebug() << "视频已经打开";
+    }
+    else {
+        Q_EMIT sig_VideoUnabled();
+        QImage img;
+        SetImgById(m_Userid, img);
+        qDebug() << "视频已经关闭";
     }
 }
 

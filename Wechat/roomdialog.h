@@ -17,27 +17,40 @@ class RoomDialog : public QDialog
 public:
     explicit RoomDialog(QWidget *parent = nullptr);
     ~RoomDialog();
-    void SetInfo(QString RoomId);
+    void SetInfo(QString RoomId, int UserId);
     void AddUser(int id, int icon, QString name);
     void Erase(int id);
     void ClearUser();
+    void SetImgById(int id, QImage& img);
     QString GetNameById(int id);
+    void Close_AudioAndVedio();
+    void ClearCheck();
 
 signals:
     void sig_QuitRoom();
+
+    // 音频打开、关闭
     void sig_AudioEnabled();
     void sig_AudioUnabled();
+
+    // 视频打开、关闭
+    void sig_VideoEnabled();
+    void sig_VideoUnabled();
 
 private slots:
     void on_pb_exit_clicked();
 
     void on_cb_audio_stateChanged(int arg1);
 
+    void on_lb_copy_clicked();
+
+    void on_cb_video_stateChanged(int arg1);
+
 private:
     Ui::RoomDialog *ui;
     std::unordered_map<int, UserShow*>  m_mapIdToUserShow;
     QVBoxLayout* m_UserList;
-
+    int          m_Userid;
     void closeEvent(QCloseEvent *);
 };
 

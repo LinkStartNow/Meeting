@@ -4,7 +4,11 @@ Audio_Write::Audio_Write(QObject *parent) : QObject(parent)
 {
     //首先初始化设备
     //声卡采样格式
+#if USE_BETTER_AUDIO
+    format.setSampleRate(16000);
+#else
     format.setSampleRate(8000);
+#endif
     format.setChannelCount(1);
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
@@ -36,7 +40,12 @@ Audio_Write::~Audio_Write()
 void Audio_Write::slot_net_rx(QByteArray ba)
 {
 #if !USE_SPEEX
+
+#if USE_BETTER_AUDIO
+    myBuffer_out->write(ba.data(), 1280);
+#else
     myBuffer_out->write( ba.data() , 640 );
+#endif
     qDebug() << "play";
 #else
     //解码 得到 320字节 大端转为小端  总共640字节 执行2次

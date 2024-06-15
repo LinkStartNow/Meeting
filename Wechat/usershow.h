@@ -24,6 +24,8 @@ public:
         return m_name;
     }
 
+    void SetImg(QImage& img);
+
 private:
     Ui::UserShow *ui;
 

@@ -12,6 +12,8 @@
 
 #define USE_SPEEX 1
 
+#define USE_BETTER_AUDIO 0
+
 #if USE_SPEEX
 ////使用speex
 #include "speex/include/speex.h"
