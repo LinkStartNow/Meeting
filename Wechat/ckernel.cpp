@@ -229,6 +229,27 @@ void CKernel::DealAudio(char *buf, int len)
     delete[] buf;
 }
 
+void CKernel::DealVedio(char *buf, int len)
+{
+    // 跳过type
+    buf += sizeof(int);
+
+    // 获得用户id
+    int UserId = *(int*)buf;
+    buf += sizeof(int);
+
+    // 跳过roomid
+    buf += sizeof(int);
+
+    QByteArray ba( buf, len);
+    QImage img;
+    img.loadFromData( ba );
+
+    m_pRoom->SetImgById(UserId, img);
+
+    delete[] buf;
+}
+
 
 #else
 void CKernel::DealAudio(char *con)
@@ -321,6 +342,10 @@ void CKernel::slot_Deal(char *buf, int len)
 #if USE_NO_JSON_AUDIO
     if (*(int*)buf == AUDIO) {
         DealAudio(buf, len);
+        return;
+    }
+    else if (*(int*)buf == VEDIO) {
+        DealVedio(buf, len);
         return;
     }
 #endif
@@ -484,13 +509,36 @@ void CKernel::slot_AudioSend(QByteArray buf)
 #endif
 }
 
+#include <QBuffer>
 void CKernel::slot_sendVideoFrame(QImage img)
 {
     qDebug() << __func__;
     // 显示图像
     m_pRoom->SetImgById(m_UserId, img);
 
-    // todo:压缩图片
+    // 压缩图片
+    QByteArray ba;
+    QBuffer qbuf(&ba); // QBuffer 与 QByteArray 字节数组联立联系
+    img.save( &qbuf , "JPEG" , 50 ); //将图片的数据写入 ba
 
     // todo:发送图片
+    // 序列化
+    int num = ba.size() + 3 * sizeof(int);
+    char* tmp = new char[num];
+    char* ssr = tmp;
+
+    // 写入类型
+    *(int*)ssr = VEDIO;
+    ssr += sizeof(int);
+
+    *(int*)ssr = m_UserId;
+    ssr += sizeof(int);
+
+    *(int*)ssr = m_RoomId;
+    ssr += sizeof(int);
+
+    memcpy(ssr, ba.data(), ba.size());
+
+    slot_SendRQ(tmp, num);
+    delete[] tmp;
 }

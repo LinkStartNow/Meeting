@@ -46,6 +46,7 @@ class CKernel : public QObject
 
 #if USE_NO_JSON_AUDIO
     void DealAudio(char*, int);
+    void DealVedio(char*, int);
 #else
     void DealAudio(char* con);
 #endif
