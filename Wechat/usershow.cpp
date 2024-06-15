@@ -45,6 +45,10 @@ void UserShow::paintEvent(QPaintEvent *event)
 
     // 画视频帧
     // 等比例缩放
+
+    // 没图片就不更新
+    if (m_image.size().height() <= 0) return;
+
     m_image = m_image.scaled(this->width(), this->height(), Qt::KeepAspectRatio);
 
     QPixmap pix = QPixmap::fromImage(m_image);
