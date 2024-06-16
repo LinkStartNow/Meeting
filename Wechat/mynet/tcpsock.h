@@ -20,7 +20,7 @@ class Tcpsock : public Mysock
 
     static bool IsRecving;
     RecvThread* m_rthread;
-
+    QThread*    m_self;
 
 public:
     Tcpsock();
@@ -29,13 +29,14 @@ public:
 
     bool Connect(const char* ip, const int port);
 
-    bool Write(char* buf, int size);
-
     bool Read();
 
     void EndRecv();
 
     void Close();
+
+public slots:
+    bool Write(char* buf, int size);
 
 signals:
     void sig_Deal(char* buf, int len);

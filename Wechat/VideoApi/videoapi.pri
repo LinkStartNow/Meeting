@@ -1,8 +1,10 @@
 HEADERS += \
     $$PWD/common.h \
+    $$PWD/screenreader.h \
     $$PWD/videoread.h
 
 SOURCES += \
+    $$PWD/screenreader.cpp \
     $$PWD/videoread.cpp
 
 

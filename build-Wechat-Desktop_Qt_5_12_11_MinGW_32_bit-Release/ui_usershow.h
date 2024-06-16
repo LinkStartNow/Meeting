@@ -59,7 +59,7 @@ public:
     void retranslateUi(QWidget *UserShow)
     {
         UserShow->setWindowTitle(QApplication::translate("UserShow", "Form", nullptr));
-        lb_name->setText(QApplication::translate("UserShow", "\347\224\250\346\210\267\345\220\215", nullptr));
+        lb_name->setText(QString());
     } // retranslateUi
 
 };
