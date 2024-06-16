@@ -37,6 +37,10 @@ signals:
     void sig_VideoEnabled();
     void sig_VideoUnabled();
 
+    // 桌面打开、关闭
+    void sig_ScreenEnabled();
+    void sig_ScreenUnabled();
+
 private slots:
     void on_pb_exit_clicked();
 
@@ -45,6 +49,10 @@ private slots:
     void on_lb_copy_clicked();
 
     void on_cb_video_stateChanged(int arg1);
+
+    void on_cb_desk_stateChanged(int arg1);
+
+    void slot_UserClicked(int id, QString name);
 
 private:
     Ui::RoomDialog *ui;

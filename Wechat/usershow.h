@@ -4,14 +4,21 @@
 #include <QWidget>
 #include <QImage>
 #include <QPaintEvent>
+#include <QMouseEvent>
+//#include "roomdialog.h"
 
 namespace Ui {
 class UserShow;
 }
 
+class RoomDialog;
+
 class UserShow : public QWidget
 {
     Q_OBJECT
+
+signals:
+    void sig_UserClicked(int id, QString name);
 
 public:
     explicit UserShow(QWidget *parent = nullptr);
@@ -26,6 +33,8 @@ public:
 
     void SetImg(QImage& img);
 
+    void Clear();
+
 private:
     Ui::UserShow *ui;
 
@@ -34,6 +43,10 @@ private:
     int     m_id;
     QString m_name;
     QImage  m_image;
+
+    void mousePressEvent(QMouseEvent* e);
+
+    friend class RoomDialog;
 };
 
 #endif // USERSHOW_H

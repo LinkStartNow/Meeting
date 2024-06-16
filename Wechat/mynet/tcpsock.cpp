@@ -6,7 +6,9 @@ bool Tcpsock::IsRecving = true;
 
 Tcpsock::Tcpsock()
 {
-
+    m_self = new QThread;
+    m_self->start();
+//    moveToThread(m_self);
 }
 
 Tcpsock::~Tcpsock()
@@ -21,6 +23,18 @@ Tcpsock::~Tcpsock()
             }
         }
         delete m_rthread; m_rthread = nullptr;
+    }
+
+    if (m_self) {
+        if (!m_self->isFinished()) {
+            m_self->quit();
+            m_self->wait(100);
+            if (!m_self->isFinished()) {
+                m_self->terminate();
+                m_self->wait(100);
+            }
+        }
+        delete m_self; m_self = nullptr;
     }
 
     Close();

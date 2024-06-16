@@ -2,6 +2,7 @@
 #include "ui_usershow.h"
 #include <QPainter>
 #include <QPixmap>
+#include <QDebug>
 
 UserShow::UserShow(QWidget *parent) :
     QWidget(parent),
@@ -31,6 +32,16 @@ void UserShow::SetImg(QImage &img)
     update();
 }
 
+void UserShow::Clear()
+{
+    // 清空名字
+    ui->lb_name->clear();
+
+    // 关闭显示
+    QImage img;
+    SetImg(img);
+}
+
 // 重绘事件
 void UserShow::paintEvent(QPaintEvent *event)
 {
@@ -49,7 +60,7 @@ void UserShow::paintEvent(QPaintEvent *event)
     // 没图片就不更新
     if (m_image.size().height() <= 0) return;
 
-    m_image = m_image.scaled(this->width(), this->height(), Qt::KeepAspectRatio);
+    m_image = m_image.scaled(this->width(), this->height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     QPixmap pix = QPixmap::fromImage(m_image);
 
@@ -59,4 +70,11 @@ void UserShow::paintEvent(QPaintEvent *event)
     p.drawPixmap(QPoint(x, y), pix);
 
     p.end();
+}
+
+void UserShow::mousePressEvent(QMouseEvent* e)
+{
+    qDebug() << __func__;
+    e->accept();
+    Q_EMIT sig_UserClicked(m_id, m_name);
 }

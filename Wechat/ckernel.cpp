@@ -302,6 +302,7 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
         exit(-1);
     }
     connect(m_chat, &Tcpsock::sig_Deal, this, &CKernel::slot_Deal);
+    connect(this, SIGNAL(sig_Write(char*,int)), m_chat, SLOT(Write(char*,int)));
 
 
     // 创建登录窗口
@@ -309,6 +310,10 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     m_pLogin->show();
     connect(m_pLogin, &LoginWin::sig_destroy, this, &CKernel::slot_destroy);
     connect(m_pLogin, SIGNAL(sig_SendRQ(char*)), this, SLOT(slot_SendRQ(char*)));
+
+    // 创建屏幕录制
+    m_pScreen_in = new ScreenReader;
+    connect(m_pScreen_in, &ScreenReader::sig_ScreenFrame, this, &CKernel::slot_sendVideoFrame);
 
     // 创建播放音频和采集音频对象
     m_pAudio_out = new Audio_Write;
@@ -327,6 +332,8 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
     connect(m_pRoom, &RoomDialog::sig_AudioUnabled, this, &CKernel::slot_AudioUnabled);
     connect(m_pRoom, &RoomDialog::sig_VideoEnabled, m_pVideo_in, &VideoRead::slot_openVideo);
     connect(m_pRoom, &RoomDialog::sig_VideoUnabled, this, &CKernel::slot_VedioUnabled);
+    connect(m_pRoom, &RoomDialog::sig_ScreenEnabled, m_pScreen_in, &ScreenReader::slot_start);
+    connect(m_pRoom, &RoomDialog::sig_ScreenUnabled, this, &CKernel::slot_ScreenUnabled);
 }
 
 
@@ -384,7 +391,8 @@ void CKernel::slot_SendRQ(char *buf, int len)
 
 void CKernel::slot_SendRQ(char * buf)
 {
-    m_chat->Write(buf, strlen(buf) + 1);
+//    m_chat->Write(buf, strlen(buf) + 1);
+    Q_EMIT sig_Write(buf, strlen(buf) + 1);
 }
 
 void CKernel::slot_create()
@@ -499,6 +507,25 @@ void CKernel::slot_VedioUnabled()
     slot_SendRQ(con.data());
 }
 
+void CKernel::slot_ScreenUnabled()
+{
+    // 关闭桌面采集
+    m_pScreen_in->slot_stop();
+
+
+    // 本地视频显示黑屏
+    QImage img;
+    m_pRoom->SetImgById(m_UserId, img);
+
+    CJson json;
+    json.json_add_value("type", CLOSE_VEDIO);
+    json.json_add_value("UserId", m_UserId);
+    json.json_add_value("RoomId", m_RoomId);
+
+    QByteArray con = json.json_to_string();
+    slot_SendRQ(con.data());
+}
+
 void CKernel::slot_AudioSend(QByteArray buf)
 {
     qDebug() << __func__;
@@ -551,9 +578,9 @@ void CKernel::slot_sendVideoFrame(QImage img)
     // 压缩图片
     QByteArray ba;
     QBuffer qbuf(&ba); // QBuffer 与 QByteArray 字节数组联立联系
-    img.save( &qbuf , "JPEG" , 50 ); //将图片的数据写入 ba
+    img.save( &qbuf , "JPEG" , 80 ); //将图片的数据写入 ba
 
-    // todo:发送图片
+    // 发送图片
     // 序列化
     int num = ba.size() + 3 * sizeof(int);
     char* tmp = new char[num];
