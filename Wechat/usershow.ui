@@ -60,7 +60,7 @@ background-color: rgb(0, 0, 0);</string>
       </size>
      </property>
      <property name="text">
-      <string/>
+      <string>用户名</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

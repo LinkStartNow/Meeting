@@ -13,7 +13,6 @@
 #include "AudioApi/audio_read.h"
 #include "AudioApi/audio_write.h"
 #include "VideoApi/videoread.h"
-#include "VideoApi/screenreader.h"
 
 class CKernel : public QObject
 {
@@ -33,7 +32,6 @@ class CKernel : public QObject
     Audio_Write*                        m_pAudio_out;
     Audio_Read*                         m_pAudio_in;
     VideoRead*                          m_pVideo_in;
-    ScreenReader*                       m_pScreen_in;
 
     void SetProFun();
     void InitConfig();
@@ -92,8 +90,6 @@ private slots:
     // 关闭音频
     void slot_VedioUnabled();
 
-    // 关闭桌面
-    void slot_ScreenUnabled();
 
     // 发送音频
     void slot_AudioSend(QByteArray buf);
@@ -101,7 +97,7 @@ private slots:
     // 处理视频图像
     void slot_sendVideoFrame(QImage img);
 signals:
-    void sig_Write(char*, int);
+
 };
 
 #endif // CKERNEL_H

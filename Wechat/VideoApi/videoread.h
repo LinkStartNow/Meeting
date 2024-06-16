@@ -6,6 +6,10 @@
 #include<QTimer>
 #include"common.h"
 
+//图片的宽高
+#define IMAGE_WIDTH (320)
+#define IMAGE_HEIGHT (240)
+
 
 class VideoRead : public QObject
 {

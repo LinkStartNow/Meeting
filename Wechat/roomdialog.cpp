@@ -34,12 +34,11 @@ void RoomDialog::SetInfo(QString RoomId, int UserId)
 
 void RoomDialog::AddUser(int id, int icon, QString name)
 {
-    UserShow*& t = m_mapIdToUserShow[id] = new UserShow;
+    const auto& t = m_mapIdToUserShow[id] = new UserShow;
     t->SetInfo(name, id);
 //    ui->vlo_user_list->addWidget(t);
     m_UserList->addWidget(t);
     t->showNormal();
-    connect(t, &UserShow::sig_UserClicked, this, &RoomDialog::slot_UserClicked);
 }
 
 void RoomDialog::Erase(int id)
@@ -53,8 +52,6 @@ void RoomDialog::Erase(int id)
     m_UserList->removeWidget(t);
     m_mapIdToUserShow.erase(id);
 
-    if (id == ui->wd_user_show->m_id) ui->wd_user_show->Clear();
-
     // todo:删除元素
 }
 
@@ -65,9 +62,6 @@ void RoomDialog::ClearUser()
 
 void RoomDialog::SetImgById(int id, QImage &img)
 {
-    if (id == ui->wd_user_show->m_id) {
-        ui->wd_user_show->SetImg(img);
-    }
     if (m_mapIdToUserShow.count(id)) {
         UserShow* t = m_mapIdToUserShow[id];
         t->SetImg(img);
@@ -132,7 +126,6 @@ void RoomDialog::on_lb_copy_clicked()
 void RoomDialog::on_cb_video_stateChanged(int arg1)
 {
     if (ui->cb_video->isChecked()) {
-        ui->cb_desk->setCheckState(Qt::Unchecked);
         Q_EMIT sig_VideoEnabled();
         qDebug() << "视频已经打开";
     }
@@ -140,25 +133,5 @@ void RoomDialog::on_cb_video_stateChanged(int arg1)
         Q_EMIT sig_VideoUnabled();
         qDebug() << "视频已经关闭";
     }
-}
-
-
-void RoomDialog::on_cb_desk_stateChanged(int arg1)
-{
-    if (ui->cb_desk->isChecked()) {
-        ui->cb_video->setCheckState(Qt::Unchecked);
-        Q_EMIT sig_ScreenEnabled();
-        qDebug() << "录屏已经打开";
-    }
-    else {
-        Q_EMIT sig_ScreenUnabled();
-        qDebug() << "录屏已经关闭";
-    }
-}
-
-void RoomDialog::slot_UserClicked(int id, QString name)
-{
-    qDebug() << __func__;
-    ui->wd_user_show->SetInfo(name, id);
 }
 
