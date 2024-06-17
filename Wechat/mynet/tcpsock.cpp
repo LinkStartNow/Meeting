@@ -8,7 +8,7 @@ Tcpsock::Tcpsock()
 {
     m_self = new QThread;
     m_self->start();
-//    moveToThread(m_self);
+    moveToThread(m_self);
 }
 
 Tcpsock::~Tcpsock()
@@ -69,7 +69,7 @@ bool Tcpsock::Connect(const char* ip, const int port)
     return true;
 }
 
-bool Tcpsock::Write(char *buf, int size)
+void Tcpsock::Write(QByteArray con, int size)
 {
     int num = 0;
     int max = sizeof(int);
@@ -78,7 +78,7 @@ bool Tcpsock::Write(char *buf, int size)
         int t;
         if ((t = send(m_sock, ssr + num, max - num, 0)) == SOCKET_ERROR) {
             qDebug() << "send size error:" << WSAGetLastError();
-            return false;
+            return;
         }
         num += t;
     }
@@ -87,11 +87,12 @@ bool Tcpsock::Write(char *buf, int size)
 
     num = 0;
     max = size;
+    char* buf = con.data();
     while (num < max) {
         int t;
         if ((t = send(m_sock, buf + num, max - num, 0)) == SOCKET_ERROR) {
             qDebug() << "send size error:" << WSAGetLastError();
-            return false;
+            return;
         }
         num += t;
     }
@@ -99,7 +100,37 @@ bool Tcpsock::Write(char *buf, int size)
 //        qDebug() << "send buf error:" << WSAGetLastError();
 //        return false;
 //    }
-    return true;
+    //    return true;
+}
+
+void Tcpsock::slot_Send(char *buf, int size)
+{
+    int num = 0;
+    int max = sizeof(int);
+    char* ssr = (char*)&size;
+    while (num < max) {
+        int t;
+        if ((t = send(m_sock, ssr + num, max - num, 0)) == SOCKET_ERROR) {
+            qDebug() << "send size error:" << WSAGetLastError();
+            return;
+        }
+        num += t;
+    }
+
+    qDebug() << "send num:" << num;
+
+    char* del = buf;
+    num = 0;
+    max = size;
+    while (num < max) {
+        int t;
+        if ((t = send(m_sock, buf + num, max - num, 0)) == SOCKET_ERROR) {
+            qDebug() << "send size error:" << WSAGetLastError();
+            return;
+        }
+        num += t;
+    }
+    delete[] del;
 }
 
 bool Tcpsock::Read()

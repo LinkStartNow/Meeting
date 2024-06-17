@@ -60,8 +60,7 @@ void LoginWin::on_pb_login_clicked()
     json.json_add_value("phone", phone.toStdString().c_str());
     json.json_add_value("pass", pass_md.c_str());
 
-    QByteArray con = json.json_to_string();
-    Q_EMIT sig_SendRQ(con.data());
+    Q_EMIT sig_SendRQ(json.json_to_string());
 }
 
 // 清空登录信息
@@ -127,8 +126,7 @@ void LoginWin::on_pb_register_clicked()
     json.json_add_value("pass", TurnToMd5(pass.toStdString()).c_str());
     json.json_add_value("name", name.toStdString().c_str());
 
-    QByteArray con = json.json_to_string();
-    Q_EMIT sig_SendRQ(con.data());
+    Q_EMIT sig_SendRQ(json.json_to_string());
 }
 
 #include <QCloseEvent>

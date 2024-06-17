@@ -302,14 +302,15 @@ CKernel::CKernel(QObject *parent) : QObject(parent)
         exit(-1);
     }
     connect(m_chat, &Tcpsock::sig_Deal, this, &CKernel::slot_Deal);
-    connect(this, SIGNAL(sig_Write(char*,int)), m_chat, SLOT(Write(char*,int)));
+    connect(this, SIGNAL(sig_Write(QByteArray,int)), m_chat, SLOT(Write(QByteArray,int)));
+    connect(this, SIGNAL(sig_Send(char*,int)), m_chat, SLOT(slot_Send(char*,int)));
 
 
     // 创建登录窗口
     m_pLogin = new LoginWin;
     m_pLogin->show();
     connect(m_pLogin, &LoginWin::sig_destroy, this, &CKernel::slot_destroy);
-    connect(m_pLogin, SIGNAL(sig_SendRQ(char*)), this, SLOT(slot_SendRQ(char*)));
+    connect(m_pLogin, SIGNAL(sig_SendRQ(QByteArray)), this, SLOT(slot_SendRQ(QByteArray)));
 
     // 创建屏幕录制
     m_pScreen_in = new ScreenReader;
@@ -382,17 +383,18 @@ void CKernel::slot_Deal(char *buf, int len)
 }
 
 #if USE_NO_JSON_AUDIO
-void CKernel::slot_SendRQ(char *buf, int len)
+void CKernel::slot_SendRQ(QByteArray buf, int len)
 {
     qDebug() << QString("发送了：%1").arg(len);
-    m_chat->Write(buf, len);
+    Q_EMIT sig_Write(buf, len);
+//    m_chat->Write(buf, len);
 }
 #endif
 
-void CKernel::slot_SendRQ(char * buf)
+void CKernel::slot_SendRQ(QByteArray buf)
 {
 //    m_chat->Write(buf, strlen(buf) + 1);
-    Q_EMIT sig_Write(buf, strlen(buf) + 1);
+    Q_EMIT sig_Write(buf, buf.size());
 }
 
 void CKernel::slot_create()
@@ -410,8 +412,10 @@ void CKernel::slot_create()
     json.json_add_value("type", CREATE_ROOM_RQ);
     json.json_add_value("id", m_UserId);
 
-    QByteArray con = json.json_to_string();
-    slot_SendRQ(con.data());
+//    std::shared_ptr<char[]> con(new QByteArray(json.json_to_string()));
+//    char* p = json.json_to_string();
+    QByteArray con(json.json_to_string());
+    slot_SendRQ(con);
 }
 
 #include <QInputDialog>
@@ -444,8 +448,7 @@ void CKernel::slot_join()
     json.json_add_value("id", m_UserId);
     json.json_add_value("room_id", RoomId.toInt());
 
-    QByteArray con = json.json_to_string();
-    slot_SendRQ(con.data());
+    slot_SendRQ(json.json_to_string());
 }
 
 void CKernel::slot_QuitRoom()
@@ -457,8 +460,7 @@ void CKernel::slot_QuitRoom()
     json.json_add_value("UserId", m_UserId);
     json.json_add_value("RoomId", m_RoomId);
 
-    QByteArray con = json.json_to_string();
-    slot_SendRQ(con.data());
+    slot_SendRQ(json.json_to_string());
 
     // 赋值房间号为无房间状态
     m_RoomId = 0;
@@ -472,6 +474,7 @@ void CKernel::slot_QuitRoom()
     // 关闭音频视频
     m_pAudio_in->pause();
     m_pVideo_in->slot_closeVideo();
+    m_pScreen_in->slot_stop();
     m_pRoom->ClearCheck();
 
     //    m_pRoom->showNormal();
@@ -503,8 +506,7 @@ void CKernel::slot_VedioUnabled()
     json.json_add_value("UserId", m_UserId);
     json.json_add_value("RoomId", m_RoomId);
 
-    QByteArray con = json.json_to_string();
-    slot_SendRQ(con.data());
+    slot_SendRQ(json.json_to_string());
 }
 
 void CKernel::slot_ScreenUnabled()
@@ -522,8 +524,7 @@ void CKernel::slot_ScreenUnabled()
     json.json_add_value("UserId", m_UserId);
     json.json_add_value("RoomId", m_RoomId);
 
-    QByteArray con = json.json_to_string();
-    slot_SendRQ(con.data());
+    slot_SendRQ(json.json_to_string());
 }
 
 void CKernel::slot_AudioSend(QByteArray buf)
@@ -533,8 +534,9 @@ void CKernel::slot_AudioSend(QByteArray buf)
 #if USE_NO_JSON_AUDIO
     // 序列化
     int num = buf.size() + 3 * sizeof(int);
-    char* tmp = new char[num];
-    char* ssr = tmp;
+
+    char* p = new char[num];
+    char* ssr = p;
 
     // 写入类型
     *(int*)ssr = AUDIO;
@@ -548,10 +550,10 @@ void CKernel::slot_AudioSend(QByteArray buf)
 
     memcpy(ssr, buf.data(), buf.size());
 
-    qDebug() << QString("size of new = %1").arg(strlen(tmp));
+//    qDebug() << QString("size of new = %1").arg(strlen(tmp));
 
-    slot_SendRQ(tmp, num);
-    delete[] tmp;
+    slot_SendRQ(QByteArray(p, num), num);
+//    Q_EMIT sig_Send(p, num);
 #else
     CJson json;
     json.json_add_value("type", AUDIO);
@@ -583,8 +585,9 @@ void CKernel::slot_sendVideoFrame(QImage img)
     // 发送图片
     // 序列化
     int num = ba.size() + 3 * sizeof(int);
-    char* tmp = new char[num];
-    char* ssr = tmp;
+//    QByteArray con(new char[num]);
+    char* con = new char[num];
+    char* ssr = con;
 
     // 写入类型
     *(int*)ssr = VEDIO;
@@ -598,6 +601,6 @@ void CKernel::slot_sendVideoFrame(QImage img)
 
     memcpy(ssr, ba.data(), ba.size());
 
-    slot_SendRQ(tmp, num);
-    delete[] tmp;
+    slot_SendRQ(QByteArray(con, num), num);
+//    Q_EMIT sig_Send(con, num);
 }

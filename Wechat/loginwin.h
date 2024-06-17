@@ -27,7 +27,7 @@ private slots:
     void on_pb_register_clicked();
 
 signals:
-    void sig_SendRQ(char*);
+    void sig_SendRQ(QByteArray);
     void sig_destroy();
 
 private:

@@ -36,7 +36,8 @@ public:
     void Close();
 
 public slots:
-    bool Write(char* buf, int size);
+    void Write(QByteArray buf, int size);
+    void slot_Send(char* buf, int size);
 
 signals:
     void sig_Deal(char* buf, int len);

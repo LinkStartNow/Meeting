@@ -14,6 +14,7 @@
 #include "AudioApi/audio_write.h"
 #include "VideoApi/videoread.h"
 #include "VideoApi/screenreader.h"
+#include <memory>
 
 class CKernel : public QObject
 {
@@ -70,10 +71,10 @@ private slots:
 
 #if USE_NO_JSON_AUDIO
     // 发送音频信息
-    void slot_SendRQ(char*, int);
+    void slot_SendRQ(QByteArray, int);
 #endif
     // 发送网络信息
-    void slot_SendRQ(char*);
+    void slot_SendRQ(QByteArray);
 
 
     // 创建房间
@@ -101,7 +102,8 @@ private slots:
     // 处理视频图像
     void slot_sendVideoFrame(QImage img);
 signals:
-    void sig_Write(char*, int);
+    void sig_Write(QByteArray, int);
+    void sig_Send(char* buf, int size);
 };
 
 #endif // CKERNEL_H
